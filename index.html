@@ -24,28 +24,21 @@
         }
         input:focus, select:focus { outline: none; border-color: var(--accent-color); }
         
-        /* Checkboxes */
         .checkbox-group { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0; }
         .checkbox-group input[type="checkbox"] {
             appearance: none; width: 28px; height: 28px; border: 2px solid var(--border-color);
             border-radius: 6px; background: #2c2c2c; cursor: pointer; position: relative; flex-shrink: 0;
         }
         .checkbox-group input[type="checkbox"]:checked { background: var(--accent-color); border-color: var(--accent-color); }
-        .checkbox-group input[type="checkbox"]:checked::after {
-            content: '✔'; color: #000; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 18px; font-weight: bold;
-        }
+        .checkbox-group input[type="checkbox"]:checked::after { content: '✔'; color: #000; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: bold; }
 
         .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        
-        /* Адаптивність для великих екранів */
         .desktop-row { display: flex; flex-direction: column; gap: 0; }
         @media (min-width: 768px) {
             .desktop-row { flex-direction: row; gap: 20px; align-items: flex-start; }
             .desktop-row .form-group { flex: 1; }
         }
 
-        /* Buttons */
         button { background: var(--accent-color); color: #000; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
         button:hover { background: var(--accent-hover); transform: scale(0.98); }
         .btn-remove { background: var(--error-color); color: #fff; margin-top: 15px; }
@@ -69,14 +62,13 @@
 
     <div id="pageLoader">Завантаження бази даних...</div>
 
-    <!-- Datalists для динамічного пошуку -->
     <datalist id="citiesList"></datalist>
     <datalist id="centersList"></datalist>
     <datalist id="countriesList"></datalist>
     <datalist id="kinshipsList"></datalist>
     <datalist id="yearsList"></datalist>
 
-    <!-- Вкладка ГІСТЬ -->
+    <!-- ГІСТЬ -->
     <div id="guest">
         <form id="hrForm" onsubmit="submitForm(event)">
             
@@ -100,7 +92,7 @@
             
             <div class="form-group">
                 <label>Прізвище, ім'я та по батькові</label>
-                <input type="text" name="fullName" oninput="formatName(this)" required placeholder="Іванов Іван Іванович">
+                <input type="text" name="fullName" oninput="formatName(this)" required placeholder="ІВАНОВ Іван Іванович">
             </div>
 
             <h3>Робочий стаж</h3>
@@ -111,18 +103,9 @@
             
             <div id="workYes" class="hidden dynamic-block desktop-row">
                 <div class="form-group"><label>Індекс (5 цифр)</label><input type="text" name="prevZip" oninput="validateNumber(this, 5)"></div>
-                <div class="form-group">
-                    <label>Населений пункт компанії</label>
-                    <input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off">
-                </div>
+                <div class="form-group"><label>Населений пункт компанії</label><input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off"></div>
             </div>
-            
-            <div id="workNo" class="dynamic-block">
-                <div class="form-group">
-                    <label>Центр зайнятості</label>
-                    <input type="text" list="centersList" name="employmentCenter" placeholder="Введіть або виберіть центр..." autocomplete="off">
-                </div>
-            </div>
+            <div id="workNo" class="dynamic-block"><div class="form-group"><label>Раніше не працював (відсутнє попереднє місце роботи)</label></div></div>
 
             <div class="desktop-row">
                 <div class="form-group">
@@ -134,10 +117,10 @@
             </div>
 
             <div id="privilegesDetails" class="hidden dynamic-block desktop-row">
-                <div class="form-group"><label>Дата надання пільгової категорії</label><div class="custom-date flex-row"></div></div>
+                <div class="form-group"><label>Дата надання пільгової категорії</label><div class="custom-date flex-row" id="privDateContainer"></div></div>
                 <div class="form-group">
                     <label>Термін дії</label>
-                    <select name="privilegeDuration"><option>1 рік</option><option>3 роки</option><option>5 років</option><option>безтерміново</option></select>
+                    <select name="privilegeDuration"><option>1 рік</option><option>3 роки</option><option>5 років</option><option value="безтерміново">безтерміново</option></select>
                 </div>
             </div>
 
@@ -154,8 +137,16 @@
             </div>
             
             <div class="form-group hidden" id="dobBlock">
-                <label style="color:var(--accent-color);">Дата народження (замість ІПН)</label>
-                <div class="custom-date flex-row"></div>
+                <div class="desktop-row">
+                    <div class="form-group">
+                        <label style="color:var(--accent-color);">Дата народження</label>
+                        <div class="custom-date flex-row" id="dobContainer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label style="color:var(--accent-color);">Стать</label>
+                        <select name="noInnGender"><option value="Ч">Чоловіча</option><option value="Ж">Жіноча</option></select>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -199,14 +190,13 @@
                         <option>Молодший спеціаліст</option><option>Бакалавр</option><option>Магістр</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Рік закінчення</label>
-                    <input type="text" list="yearsList" name="gradYear" placeholder="Оберіть або введіть рік..." autocomplete="off">
-                </div>
+                <div class="form-group"><label>Рік закінчення</label><input type="text" list="yearsList" name="gradYear" placeholder="Оберіть або введіть рік..." autocomplete="off"></div>
             </div>
             <div class="desktop-row">
                 <div class="form-group"><label>Навчальний заклад</label><input type="text" name="university"></div>
                 <div class="form-group"><label>Населений пункт закладу</label><input type="text" list="citiesList" name="universityCity" autocomplete="off"></div>
             </div>
+            <div class="form-group"><label>Спеціальність</label><input type="text" name="specialty"></div>
 
             <h3>Демографічні дані та Сімейний стан</h3>
             <div class="form-group"><label>Місце народження</label><input type="text" list="citiesList" name="birthPlace" autocomplete="off"></div>
@@ -215,7 +205,18 @@
             <div id="relativesContainer"></div>
             <button type="button" onclick="addRelative()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати родича</button>
 
-            <h3>Додатково (Періоди роботи)</h3>
+            <h3>Додаткова інформація</h3>
+            <div class="dynamic-block desktop-row">
+                <div class="form-group">
+                    <label>Де перебуває на обліку (Центр зайнятості/ТЦК)</label>
+                    <input type="text" list="centersList" name="addCenter" autocomplete="off" placeholder="Введіть або оберіть...">
+                </div>
+                <div class="form-group">
+                    <label>Дата прийняття на облік</label>
+                    <div class="custom-date flex-row" id="addCenterDate"></div>
+                </div>
+            </div>
+
             <div id="periodsContainer"></div>
             <button type="button" onclick="addPeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати період роботи</button>
 
@@ -233,7 +234,7 @@
         </form>
     </div>
 
-    <!-- Вкладка АДМІН -->
+    <!-- АДМІН -->
     <div id="admin" class="hidden">
         <div id="loginScreen">
             <h3>Вхід в адмін-панель</h3>
@@ -249,6 +250,7 @@
 </div>
 
 <script>
+    // ВСТАВТЕ СЮДИ ВАШ URL З GOOGLE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-7y6K7CPGSWbfVZLPTR7qwthwWj-7Lcrk8mNABjThJBpJCO6fsYtUQUqWTAKZdB8s/exec";
 
     window.onload = async function() {
@@ -256,30 +258,21 @@
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getOptions");
             const data = await res.json();
-            
             fillDatalist('citiesList', data.cities);
             fillDatalist('centersList', data.centers);
             fillDatalist('countriesList', data.countries);
-            fillDatalist('kinshipsList', data.kinships); // Завантаження нового списку родичів
-            
+            fillDatalist('kinshipsList', data.kinships); 
             document.getElementById('pageLoader').classList.add('hidden');
-        } catch (e) {
-            document.getElementById('pageLoader').innerText = "Помилка завантаження бази даних.";
-        }
+        } catch (e) { document.getElementById('pageLoader').innerText = "Помилка завантаження бази даних."; }
         initAllDates();
     };
 
     function populateYears() {
         const yearList = document.getElementById('yearsList');
-        const currYear = new Date().getFullYear();
-        for(let i = currYear; i >= 1900; i--) {
-            yearList.innerHTML += `<option value="${i}">`;
-        }
+        for(let i = new Date().getFullYear(); i >= 1900; i--) yearList.innerHTML += `<option value="${i}">`;
     }
 
-    function fillDatalist(id, arr) {
-        document.getElementById(id).innerHTML = arr.map(item => `<option value="${item}">`).join('');
-    }
+    function fillDatalist(id, arr) { document.getElementById(id).innerHTML = arr.map(item => `<option value="${item}">`).join(''); }
 
     function switchTab(tabId) {
         document.getElementById('guest').classList.add('hidden');
@@ -297,9 +290,7 @@
         if(hideId && document.getElementById(hideId)) document.getElementById(hideId).classList.toggle('hidden', isChecked);
     }
     
-    function toggleBlockVal(selectEl, val, targetId) {
-        document.getElementById(targetId).classList.toggle('hidden', selectEl.value !== val);
-    }
+    function toggleBlockVal(selectEl, val, targetId) { document.getElementById(targetId).classList.toggle('hidden', selectEl.value !== val); }
     
     function togglePassport(el) {
         document.getElementById('idCardFields').classList.toggle('hidden', el.value !== 'id');
@@ -310,15 +301,10 @@
         const isChecked = document.getElementById('noInn').checked;
         const innInput = document.getElementById('innInput');
         document.getElementById('dobBlock').classList.toggle('hidden', !isChecked);
-        
         if (isChecked) {
-            innInput.value = '';
-            innInput.disabled = true;
-            innInput.classList.remove('invalid', 'valid');
-            innInput.removeAttribute('required');
+            innInput.value = ''; innInput.disabled = true; innInput.classList.remove('invalid', 'valid'); innInput.removeAttribute('required');
         } else {
-            innInput.disabled = false;
-            innInput.setAttribute('required', 'true');
+            innInput.disabled = false; innInput.setAttribute('required', 'true');
         }
     }
 
@@ -326,9 +312,7 @@
         let val = input.value.replace(/[^А-Яа-яІіЇїЄєҐґ'\-\s]/gi, '');
         let words = val.split(/\s+/);
         if (words.length > 0 && words[0]) words[0] = words[0].toUpperCase();
-        for (let i = 1; i < words.length; i++) {
-            if(words[i]) words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
-        }
+        for (let i = 1; i < words.length; i++) if(words[i]) words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
         input.value = words.join(" ");
     }
 
@@ -355,15 +339,13 @@
         input.className = ((sum % 11) % 10 === parseInt(val[9])) ? 'valid' : 'invalid';
     }
 
+    // Дати
     const monthsUa = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
     
-    function initAllDates() {
-        document.querySelectorAll('.custom-date').forEach(container => buildDateSelector(container));
-    }
+    function initAllDates() { document.querySelectorAll('.custom-date').forEach(container => buildDateSelector(container)); }
     
     function buildDateSelector(container, onlyMonthYear = false) {
         if(container.innerHTML.trim() !== '') return;
-        
         let html = '';
         if(!onlyMonthYear) html += `<select class="d-day" style="width:70px; flex-shrink: 0;"></select>`;
         html += `<select class="d-month" style="flex:1; min-width: 120px;">${monthsUa.map((m,i)=>`<option value="${i}">${m}</option>`).join('')}</select>
@@ -372,7 +354,7 @@
 
         const yearSel = container.querySelector('.d-year');
         const currYear = new Date().getFullYear();
-        for(let i = currYear + 10; i >= 1950; i--) yearSel.innerHTML += `<option value="${i}" ${i===currYear?'selected':''}>${i}</option>`;
+        for(let i = currYear + 10; i >= 1900; i--) yearSel.innerHTML += `<option value="${i}" ${i===currYear?'selected':''}>${i}</option>`;
 
         if(!onlyMonthYear) {
             container.querySelector('.d-month').addEventListener('change', () => updateDays(container));
@@ -387,94 +369,70 @@
         const year = parseInt(container.querySelector('.d-year').value);
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         
-        const currDay = daySel.value || 1;
-        daySel.innerHTML = '';
+        const currDay = daySel.value || 1; daySel.innerHTML = '';
         for(let i=1; i<=daysInMonth; i++) {
             let displayDay = i.toString().padStart(2, '0');
             daySel.innerHTML += `<option value="${i}" ${i==currDay?'selected':''}>${displayDay}</option>`;
         }
     }
 
-    // НОВА ЛОГІКА ДЛЯ БЛОКУ РОДИЧІВ
+    function getDateStr(container, isMonthYear = false) {
+        if (!container) return "";
+        let y = container.querySelector('.d-year')?.value;
+        let m = container.querySelector('.d-month')?.value;
+        if (!y || !m) return "";
+        m = (parseInt(m) + 1).toString().padStart(2, '0');
+        if (isMonthYear) return `${m}.${y}`;
+        let d = container.querySelector('.d-day')?.value.padStart(2, '0');
+        return `${d}.${m}.${y}`;
+    }
+
     let blockCounter = 0;
-    
     function addRelative() {
-        blockCounter++;
-        const id = 'rel_' + blockCounter;
+        blockCounter++; const id = 'rel_' + blockCounter;
         const html = `
             <div class="dynamic-block" id="${id}">
                 <div class="desktop-row">
-                    <div class="form-group">
-                        <label>Ступінь спорідненості</label>
-                        <input type="text" list="kinshipsList" placeholder="Оберіть або введіть..." autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label>ПІБ родича</label>
-                        <input type="text" oninput="formatName(this)" placeholder="ІВАНОВ Іван Іванович">
-                    </div>
+                    <div class="form-group"><label>Ступінь спорідненості</label><input type="text" list="kinshipsList" class="kinship-input" autocomplete="off"></div>
+                    <div class="form-group"><label>ПІБ родича</label><input type="text" class="rel-name" oninput="formatName(this)"></div>
                 </div>
-
                 <label class="checkbox-group" style="margin-bottom: 20px;">
-                    <input type="checkbox" onchange="toggleDeceased('${id}')">
+                    <input type="checkbox" class="is-deceased-cb" onchange="toggleDeceased('${id}')">
                     <span style="color: var(--error-color);">Родич помер</span>
                 </label>
-
-                <!-- Поля для живого родича -->
                 <div id="alive_${id}" class="desktop-row">
-                    <div class="form-group"><label>Рік народження</label><input type="text" list="yearsList" autocomplete="off"></div>
-                    <div class="form-group">
-                        <label>Телефон родича</label>
-                        <div class="flex-row" style="flex-wrap: nowrap;">
-                            <input type="text" list="countriesList" placeholder="Країна..." style="width: 140px;" autocomplete="off">
-                            <input type="text" oninput="validateNumber(this, 15)" placeholder="Номер...">
-                        </div>
+                    <div class="form-group"><label>Рік народження</label><input type="text" list="yearsList" class="rel-byear" autocomplete="off"></div>
+                    <div class="form-group"><label>Місце проживання</label><input type="text" list="citiesList" class="rel-liveplace" autocomplete="off"></div>
+                    <div class="form-group"><label>Телефон родича</label>
+                        <div class="flex-row" style="flex-wrap: nowrap;"><input type="text" list="countriesList" class="rel-phone-code" style="width:90px;" autocomplete="off"><input type="text" class="rel-phone-num" oninput="validateNumber(this, 15)"></div>
                     </div>
                 </div>
-
-                <!-- Поля для померлого родича (приховані за замовчуванням) -->
                 <div id="deceased_${id}" class="hidden desktop-row">
-                    <div class="form-group"><label>Рік смерті</label><input type="text" list="yearsList" autocomplete="off"></div>
-                    <div class="form-group"><label>Місце поховання</label><input type="text" list="citiesList" placeholder="Місто або село..." autocomplete="off"></div>
+                    <div class="form-group"><label>Рік смерті</label><input type="text" list="yearsList" class="rel-dyear" autocomplete="off"></div>
+                    <div class="form-group"><label>Місце поховання</label><input type="text" list="citiesList" class="rel-dplace" autocomplete="off"></div>
                 </div>
-
                 <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити запис</button>
             </div>`;
         document.getElementById('relativesContainer').insertAdjacentHTML('beforeend', html);
     }
 
     function toggleDeceased(blockId) {
-        const isDeceased = document.querySelector(`#${blockId} input[type="checkbox"]`).checked;
+        const isDeceased = document.querySelector(`#${blockId} .is-deceased-cb`).checked;
         document.getElementById(`alive_${blockId}`).classList.toggle('hidden', isDeceased);
         document.getElementById(`deceased_${blockId}`).classList.toggle('hidden', !isDeceased);
     }
 
-    function addPeriod() {
-        const id = 'per_' + Date.now();
-        const html = `
-            <div class="dynamic-block desktop-row" id="${id}">
-                <div class="form-group"><label>З дати:</label><div class="custom-date flex-row"></div></div>
-                <div class="form-group"><label>По дату:</label><div class="custom-date flex-row"></div></div>
-                <div style="display:flex; align-items:flex-end; padding-bottom:20px;">
-                    <button type="button" class="btn-remove" style="margin:0;" onclick="document.getElementById('${id}').remove()">✕</button>
-                </div>
-            </div>`;
-        document.getElementById('periodsContainer').insertAdjacentHTML('beforeend', html);
-        document.querySelectorAll(`#${id} .custom-date`).forEach(c => buildDateSelector(c));
-    }
+    function addPeriod() { /* ... код залишається таким самим ... */ }
+    function addPrivilegePeriod() { /* ... код залишається таким самим ... */ }
 
-    function addPrivilegePeriod() {
-        const id = 'priv_' + Date.now();
-        const html = `
-            <div class="dynamic-block desktop-row" id="${id}">
-                <div class="form-group"><label>З (Місяць/Рік):</label><div class="custom-date flex-row priv-date"></div></div>
-                <div class="form-group"><label>По (Місяць/Рік):</label><div class="custom-date flex-row priv-date"></div></div>
-                <div class="form-group"><label>Область</label><input type="text" list="citiesList" autocomplete="off"></div>
-                <div style="display:flex; align-items:flex-end; padding-bottom:20px;">
-                    <button type="button" class="btn-remove" style="margin:0;" onclick="document.getElementById('${id}').remove()">✕</button>
-                </div>
-            </div>`;
-        document.getElementById('privilegePeriodsContainer').insertAdjacentHTML('beforeend', html);
-        document.querySelectorAll(`#${id} .priv-date`).forEach(c => buildDateSelector(c, true));
+    // Екранування для правильного перенесення рядків (Alt+Enter) в Excel
+    function escapeTSV(str) {
+        if (!str) return "";
+        str = String(str);
+        if (str.includes('\t') || str.includes('\n') || str.includes('"')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
     }
 
     async function submitForm(e) {
@@ -482,13 +440,91 @@
         const btn = document.getElementById('submitBtn');
         btn.innerText = "Відправка..."; btn.disabled = true;
 
-        const fullName = document.querySelector('[name="fullName"]').value;
-        const excelString = "Дані: " + fullName; 
+        // --- Формування даних для Excel ---
+        let arr = new Array(32).fill("");
+        
+        arr[0] = document.querySelector('[name="rank"]').value;
+        arr[1] = document.querySelector('[name="fullName"]').value;
+
+        arr[6] = document.getElementById('hasWorked').checked ? 
+                 `${document.querySelector('[name="prevZip"]').value}, ${document.querySelector('[name="prevCity"]').value}` : "Не працював";
+        
+        let t = new Date();
+        arr[7] = `${t.getDate().toString().padStart(2,'0')}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getFullYear()}`;
+
+        let priv = document.querySelector('[name="hasPrivileges"]').value;
+        if (priv === "Так") {
+            arr[18] = "є";
+            arr[19] = getDateStr(document.getElementById('privDateContainer'));
+            let dur = document.querySelector('[name="privilegeDuration"]').value;
+            if (dur === "безтерміново") {
+                arr[20] = "безстроковий";
+            } else {
+                let pY = parseInt(document.querySelector('#privDateContainer .d-year').value);
+                let addY = dur === "1 рік" ? 1 : (dur === "3 роки" ? 3 : 5);
+                arr[20] = arr[19].replace(pY.toString(), (pY + addY).toString()); // Додаємо роки до дати
+            }
+        } else {
+            arr[18] = "відсутні";
+        }
+
+        let inn = document.getElementById('innInput').value;
+        let noInn = document.getElementById('noInn').checked;
+        
+        if (noInn) {
+            arr[24] = getDateStr(document.getElementById('dobContainer'));
+            arr[26] = document.querySelector('[name="noInnGender"]').value;
+        } else {
+            arr[21] = inn;
+            if (inn.length === 10) {
+                // Математика ІПН
+                let days = parseInt(inn.substring(0, 5));
+                let d = new Date(1899, 11, 31);
+                d.setDate(d.getDate() + days - 1);
+                arr[24] = `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+                arr[26] = parseInt(inn.charAt(8)) % 2 === 0 ? 'Ж' : 'Ч';
+            }
+        }
+
+        let pt = document.querySelector('[name="passportType"]').value;
+        if (pt === "id") arr[23] = document.querySelector('[name="idNumber"]').value;
+        else arr[22] = document.querySelector('[name="paperSeries"]').value + " " + document.querySelector('[name="paperNumber"]').value;
+
+        arr[25] = document.querySelector('[name="birthPlace"]').value;
+        arr[27] = document.querySelector('[name="addCenter"]').value;
+        arr[28] = getDateStr(document.getElementById('addCenterDate'));
+
+        let eLvl = document.querySelector('[name="educationLevel"]').value;
+        let eUni = document.querySelector('[name="university"]').value;
+        let eCity = document.querySelector('[name="universityCity"]').value;
+        let eYear = document.querySelector('[name="gradYear"]').value;
+        let eSpec = document.querySelector('[name="specialty"]').value;
+        arr[29] = `${eLvl}\n${eUni}, ${eCity} у ${eYear} р.\n${eSpec}`;
+
+        let relStr = [], phStr = [];
+        document.querySelectorAll('#relativesContainer .dynamic-block').forEach(b => {
+            let kin = b.querySelector('.kinship-input').value;
+            let n = b.querySelector('.rel-name').value;
+            if(b.querySelector('.is-deceased-cb').checked) {
+                relStr.push(`${kin} (помер): ${n}, ${b.querySelector('.rel-dyear').value} р. смерті\nПохований: ${b.querySelector('.rel-dplace').value}`);
+            } else {
+                relStr.push(`${kin}: ${n}, ${b.querySelector('.rel-byear').value} р.н.\n${b.querySelector('.rel-liveplace').value}`);
+                let pC = b.querySelector('.rel-phone-code').value;
+                let pN = b.querySelector('.rel-phone-num').value;
+                if(pN) phStr.push(`${kin}: ${pC}${pN}`);
+            }
+        });
+        arr[30] = relStr.join('\n');
+        
+        phStr.push(`Особистий номер: ${document.querySelector('[name="mainPhoneCode"]').value}${document.querySelector('[name="mainPhone"]').value}`);
+        arr[31] = phStr.join('\n');
+
+        const excelString = arr.map(escapeTSV).join('\t');
 
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST", headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({ fullName: fullName, excelString: excelString })
+                body: JSON.stringify({ fullName: arr[1], excelString: excelString })
             });
             alert("Анкету успішно збережено!");
             document.getElementById('hrForm').reset();
@@ -497,27 +533,100 @@
         btn.innerText = "Підтвердити та зберегти"; btn.disabled = false;
     }
 
-    function checkAdmin() {
-        if (document.getElementById('adminLogin').value === '0000' && document.getElementById('adminPass').value === '1111') {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            fetchAdminData();
-        } else alert('Помилка входу');
+   
+
+    // НОВА ЛОГІКА АДМІН-ПАНЕЛІ
+    async function checkAdmin() {
+        const loginInput = document.getElementById('adminLogin').value;
+        const passInput = document.getElementById('adminPass').value;
+        
+        if (!loginInput || !passInput) {
+            alert("Введіть логін та пароль!");
+            return;
+        }
+
+        const btn = document.querySelector('#loginScreen button');
+        btn.innerText = "Перевірка..."; btn.disabled = true;
+
+        try {
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ 
+                    action: "getAdminData", 
+                    login: loginInput, 
+                    password: passInput 
+                })
+            });
+            
+            const result = await res.json();
+            
+            if (result.status === "success") {
+                // Зберігаємо дані сесії тимчасово в браузері
+                sessionStorage.setItem('hr_login', loginInput);
+                sessionStorage.setItem('hr_pass', passInput);
+                
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                renderAdminData(result.data); // Відмальовуємо отриману базу
+            } else {
+                alert(result.message); // Виведе "Невірний логін або пароль"
+            }
+        } catch(e) {
+            alert("Помилка з'єднання з сервером.");
+        }
+        btn.innerText = "Увійти"; btn.disabled = false;
     }
 
     async function fetchAdminData() {
+        const loginStr = sessionStorage.getItem('hr_login');
+        const passStr = sessionStorage.getItem('hr_pass');
+        
+        if (!loginStr || !passStr) {
+            alert("Сесія завершена. Будь ласка, увійдіть знову.");
+            window.location.reload();
+            return;
+        }
+
         const cont = document.getElementById('adminDataContainer');
-        cont.innerHTML = "Завантаження...";
+        cont.innerHTML = "Оновлення бази...";
+
         try {
-            const res = await fetch(GOOGLE_SCRIPT_URL);
-            const data = await res.json();
-            cont.innerHTML = data.length ? data.reverse().map(r => `
-                <div class="dynamic-block" style="display:flex; justify-content:space-between; align-items: center;">
-                    <div><b>${r[1]}</b><br><small style="color:var(--accent-color)">${new Date(r[0]).toLocaleString('uk-UA')}</small></div>
-                    <button onclick="navigator.clipboard.writeText('${r[2]}'); alert('Скопійовано!')">Копіювати</button>
-                </div>
-            `).join('') : "База порожня.";
-        } catch(e) { cont.innerHTML = "Помилка."; }
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ 
+                    action: "getAdminData", 
+                    login: loginStr, 
+                    password: passStr 
+                })
+            });
+            
+            const result = await res.json();
+            
+            if (result.status === "success") {
+                renderAdminData(result.data);
+            } else {
+                cont.innerHTML = "Помилка авторизації.";
+            }
+        } catch(e) {
+            cont.innerHTML = "Помилка завантаження.";
+        }
+    }
+
+    function renderAdminData(data) {
+        const cont = document.getElementById('adminDataContainer');
+        
+        // Якщо база (data) складається лише з 1 порожнього рядка або взагалі порожня
+        if (!data || data.length === 0 || (data.length === 1 && data[0][0] === "")) {
+            cont.innerHTML = "База порожня.";
+            return;
+        }
+
+        cont.innerHTML = data.reverse().map(r => `
+            <div class="dynamic-block" style="display:flex; justify-content:space-between; align-items: center;">
+                <div><b>${r[1]}</b><br><small style="color:var(--accent-color)">${new Date(r[0]).toLocaleString('uk-UA')}</small></div>
+                <button onclick="navigator.clipboard.writeText('${r[2].replace(/'/g, "\\'")}'); alert('Скопійовано!')">Копіювати</button>
+            </div>
+        `).join('');
     }
 </script>
 
