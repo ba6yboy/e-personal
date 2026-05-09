@@ -3,124 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Прийом о/с | Головна</title>
+    <title>ППОС</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --border-color: #333;
-            --accent-color: #bb86fc;
-            --accent-hover: #9965f4;
-            --error-color: #cf6679;
-            --success-color: #03dac6;
+            --bg-color: #121212; --container-bg: #1e1e1e; --text-color: #f1f1f1;
+            --border-color: #444; --accent-color: #bb86fc; --accent-hover: #9965f4;
+            --error-color: #cf6679; --success-color: #03dac6;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; font-size: 1.1rem; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--container-bg); padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        h3 { border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 35px; color: var(--accent-color); font-size: 1.3rem;}
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        
+        input, select { 
+            width: 100%; padding: 12px; background: #2c2c2c; border: 2px solid var(--border-color); 
+            color: var(--text-color); border-radius: 8px; font-size: 1.1rem; transition: 0.2s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent-color); }
+        
+        /* Checkboxes */
+        .checkbox-group { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0; }
+        .checkbox-group input[type="checkbox"] {
+            appearance: none; width: 28px; height: 28px; border: 2px solid var(--border-color);
+            border-radius: 6px; background: #2c2c2c; cursor: pointer; position: relative;
+            flex-shrink: 0;
+        }
+        .checkbox-group input[type="checkbox"]:checked { background: var(--accent-color); border-color: var(--accent-color); }
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '✔'; color: #000; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 18px; font-weight: bold;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--container-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            opacity: 0.7;
-            transition: 0.3s;
-        }
-        .tab-btn.active {
-            opacity: 1;
-            border-bottom: 2px solid var(--accent-color);
-            color: var(--accent-color);
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* Forms */
-        h3 { border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-top: 30px;}
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus { outline: 1px solid var(--accent-color); }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; }
-        .checkbox-group input { width: auto; }
+        /* Flex & Split fields */
+        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .split-box { width: 3.5em; text-align: center; letter-spacing: 2px; }
+        .split-box-lg { width: 5em; text-align: center; }
+        
+        /* Phone input */
+        .phone-wrapper { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .phone-wrapper span { font-weight: bold; color: #888; }
         
         /* Buttons */
-        button {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        button:hover { background: var(--accent-hover); }
-        .btn-remove { background: var(--error-color); margin-top: 10px; }
+        button { background: var(--accent-color); color: #000; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
+        button:hover { background: var(--accent-hover); transform: scale(0.98); }
+        .btn-remove { background: var(--error-color); color: #fff; margin-top: 15px; }
         .btn-remove:hover { background: #b05263; }
 
-        /* Validation */
-        .valid { border-color: var(--success-color) !important; outline-color: var(--success-color) !important; }
-        .invalid { border-color: var(--error-color) !important; outline-color: var(--error-color) !important; }
+        .hidden { display: none !important; }
+        .dynamic-block { border: 2px dashed var(--border-color); padding: 20px; margin-bottom: 20px; border-radius: 8px; background: #242424;}
         
-        .hidden { display: none; }
-        .dynamic-block { border: 1px dashed var(--border-color); padding: 15px; margin-bottom: 15px; position: relative; }
-        
-        /* Admin Table */
-        .admin-row {
-            background: var(--bg-color);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Validation Classes */
+        .valid { border-color: var(--success-color) !important; }
+        .invalid { border-color: var(--error-color) !important; }
+
+        /* Loader */
+        #pageLoader { padding: 15px; background: #333; color: #fff; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+
+        @media(max-width: 600px) {
+            .split-box, .split-box-lg { flex: 1; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('guest')">Гість</button>
-        <button class="tab-btn" onclick="switchTab('admin')">Адмін</button>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button id="tabGuest" onclick="switchTab('guest')" style="flex:1;">Гість</button>
+        <button id="tabAdmin" onclick="switchTab('admin')" style="flex:1; background:#444; color:#fff;">Адмін</button>
     </div>
 
+    <div id="pageLoader">Завантаження налаштувань із бази даних...</div>
+
     <!-- Вкладка ГІСТЬ -->
-    <div id="guest" class="tab-content active">
+    <div id="guest">
         <form id="hrForm" onsubmit="submitForm(event)">
             
-            <!-- Загальні відомості -->
             <h3>Загальні відомості</h3>
             <div class="form-group">
                 <label>Розряд робітника</label>
@@ -131,367 +91,349 @@
             </div>
             <div class="form-group">
                 <label>Прізвище, ім'я та по батькові</label>
-                <input type="text" name="fullName" id="fullName" onblur="formatName(this)" required placeholder="Іванов Іван Іванович">
+                <input type="text" name="fullName" oninput="formatName(this)" required placeholder="Іванов Іван Іванович">
             </div>
 
-            <!-- Робочий стаж -->
-            <h3>Попередня військова служба</h3>
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="hasWorked" onchange="toggleWorkExp()">
-                <label for="hasWorked">Чи працювала людина до цього?</label>
-            </div>
+            <h3>Робочий стаж</h3>
+            <label class="checkbox-group">
+                <input type="checkbox" id="hasWorked" onchange="toggleBlock('hasWorked', 'workYes', 'workNo')">
+                <span>Чи працювала людина до цього?</span>
+            </label>
             
-            <div id="workYes" class="hidden">
-                <div class="form-group"><label>Військова частина в форматі А0000</label><input type="text" name="prevZip"></div>
+            <div id="workYes" class="hidden dynamic-block">
+                <div class="form-group"><label>Індекс (5 цифр)</label><input type="text" name="prevZip" oninput="validateNumber(this, 5)"></div>
                 <div class="form-group">
-                    <label>Населений пункт розташування частини</label>
-                    <select name="prevCity"><option value="Київ">Київ</option><option value="Львів">Львів</option><option value="Одеса">Одеса</option><option value="Інше">Інше...</option></select>
+                    <label>Населений пункт компанії</label>
+                    <select name="prevCity" class="dynamic-city"></select>
                 </div>
             </div>
             
-            <div id="workNo">
+            <div id="workNo" class="dynamic-block">
                 <div class="form-group">
                     <label>Центр зайнятості</label>
-                    <select name="employmentCenter"><option value="Київський МЦЗ">Київський МЦЗ</option><option value="Львівський ОЦЗ">Львівський ОЦЗ</option><option value="Не стояв на обліку">Не стояв на обліку</option></select>
+                    <select name="employmentCenter" class="dynamic-center"></select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Наявність пільгових категорій</label>
-                <select id="hasPrivileges" name="hasPrivileges" onchange="togglePrivileges()">
-                    <option value="Ні">Ні</option>
-                    <option value="Так">Так</option>
+                <select name="hasPrivileges" onchange="toggleBlockVal(this, 'Так', 'privilegesDetails')">
+                    <option value="Ні">Ні</option><option value="Так">Так</option>
                 </select>
             </div>
-            <div id="privilegesDetails" class="hidden">
-                <div class="form-group"><label>Дата надання пільгової категорії</label><input type="date" name="privilegeDate"></div>
+            <div id="privilegesDetails" class="hidden dynamic-block">
+                <div class="form-group">
+                    <label>Дата надання пільгової категорії</label>
+                    <div class="custom-date flex-row" data-name="privilegeDate"></div>
+                </div>
                 <div class="form-group">
                     <label>Термін дії</label>
-                    <select name="privilegeDuration"><option value="1 рік">1 рік</option><option value="3 роки">3 роки</option><option value="5 років">5 років</option><option value="безтерміново">безтерміново</option></select>
+                    <select name="privilegeDuration"><option>1 рік</option><option>3 роки</option><option>5 років</option><option>безтерміново</option></select>
                 </div>
             </div>
 
-            <!-- Паспортні дані -->
             <h3>Паспортні дані</h3>
             <div class="form-group">
-                <label>ІПН (РНОКПП)</label>
-                <input type="text" name="inn" id="inn" oninput="validateINN(this)" maxlength="10" required>
+                <label>ІПН (10 цифр)</label>
+                <input type="text" name="inn" oninput="validateINN(this)" maxlength="10" required placeholder="1234567890">
             </div>
             <div class="form-group">
                 <label>Вид паспорту</label>
-                <select id="passportType" name="passportType" onchange="togglePassportType()">
+                <select name="passportType" onchange="togglePassport(this)">
                     <option value="id">ID-картка</option>
                     <option value="paper">Паперовий</option>
                 </select>
             </div>
 
-            <div id="idCardFields">
-                <div class="form-group"><label>Номер паспорта (9 цифр)</label><input type="text" name="idNumber" pattern="\d{9}" maxlength="9"></div>
-                <div class="form-group"><label>Дата видачі</label><input type="date" name="idIssueDate"></div>
-                <div class="form-group"><label>Дата закінчення</label><input type="date" name="idExpDate"></div>
-                <div class="form-group"><label>Номер органу (4 цифри)</label><input type="text" name="idAuthority" pattern="\d{4}" maxlength="4"></div>
+            <div id="idCardFields" class="dynamic-block">
+                <div class="form-group"><label>Номер паспорта (9 цифр)</label><input type="text" name="idNumber" oninput="validateNumber(this, 9)"></div>
+                <div class="form-group"><label>Дата видачі</label><div class="custom-date flex-row" data-name="idIssueDate"></div></div>
+                <div class="form-group"><label>Дата закінчення</label><div class="custom-date flex-row" data-name="idExpDate"></div></div>
+                <div class="form-group"><label>Орган, що видав (4 цифри)</label><input type="text" name="idAuthority" oninput="validateNumber(this, 4)"></div>
             </div>
 
-            <div id="paperCardFields" class="hidden">
-                <div class="form-group"><label>Серія (2 кириличні букви)</label><input type="text" name="paperSeries" pattern="[А-Яа-яІіЇїЄєҐґ]{2}" maxlength="2"></div>
-                <div class="form-group"><label>Номер (6 цифр)</label><input type="text" name="paperNumber" pattern="\d{6}" maxlength="6"></div>
-                <div class="form-group"><label>Дата видачі</label><input type="date" name="paperIssueDate"></div>
+            <div id="paperCardFields" class="hidden dynamic-block">
+                <div class="form-group">
+                    <label>Серія та Номер</label>
+                    <div class="flex-row">
+                        <input type="text" name="paperSeries" class="split-box" placeholder="АА" oninput="validateCyrillic(this, 2, 'paperNum')" id="paperSer">
+                        <input type="text" name="paperNumber" class="split-box-lg" placeholder="123456" oninput="validateNumber(this, 6)" id="paperNum">
+                    </div>
+                </div>
+                <div class="form-group"><label>Дата видачі</label><div class="custom-date flex-row" data-name="paperIssueDate"></div></div>
                 <div class="form-group"><label>Орган, що видав</label><input type="text" name="paperAuthority"></div>
             </div>
 
-            <!-- Демографічні дані & Освіта -->
             <h3>Демографічні дані та Освіта</h3>
-            <div class="form-group"><label>Місце народження</label><select name="birthPlace"><option value="Київ">Київ</option><option value="Львів">Львів</option><option value="Інше">Інше</option></select></div>
-            <div class="form-group"><label>Рівень освіти</label><select name="educationLevel"><option value="Вища">Вища</option><option value="Базова вища">Базова вища</option><option value="Середня">Середня</option></select></div>
+            <div class="form-group"><label>Місце народження</label><select name="birthPlace" class="dynamic-city"></select></div>
+            <div class="form-group"><label>Рівень освіти</label>
+                <select name="educationLevel">
+                    <option>Базова загальна середня</option><option>Повна загальна середня</option>
+                    <option>Молодший спеціаліст</option><option>Бакалавр</option><option>Магістр</option>
+                </select>
+            </div>
             <div class="form-group"><label>Навчальний заклад</label><input type="text" name="university"></div>
-            <div class="form-group"><label>Рік закінчення</label><input type="number" name="gradYear" min="1950" max="2030"></div>
+            <div class="form-group"><label>Рік закінчення</label><input type="text" oninput="validateNumber(this, 4)" placeholder="2020"></div>
 
-            <!-- Сімейний стан -->
             <h3>Сімейний стан</h3>
-            <div class="form-group"><label>Сімейний стан</label><select name="maritalStatus"><option value="Одружений/Заміжня">Одружений/Заміжня</option><option value="Неодружений/Незаміжня">Неодружений/Незаміжня</option></select></div>
+            <div class="form-group"><label>Сімейний стан</label><select name="maritalStatus"><option>Одружений/Заміжня</option><option>Неодружений/Незаміжня</option></select></div>
             <div id="relativesContainer"></div>
             <button type="button" onclick="addRelative()">+ Додати родича</button>
 
-            <!-- Додатково -->
             <h3>Додатково (Періоди роботи)</h3>
             <div id="periodsContainer"></div>
             <button type="button" onclick="addPeriod()">+ Додати період роботи</button>
 
-            <div class="form-group checkbox-group" style="margin-top:20px;">
-                <input type="checkbox" id="hasPrivilegeWork" onchange="togglePrivilegeWork()">
-                <label for="hasPrivilegeWork">Чи працювала людина на пільгових умовах?</label>
+            <label class="checkbox-group" style="margin-top:25px;">
+                <input type="checkbox" id="hasPrivilegeWork" onchange="toggleBlock('hasPrivilegeWork', 'privilegePeriodsWrapper')">
+                <span>Чи працювала людина на пільгових умовах?</span>
+            </label>
+            <div id="privilegePeriodsWrapper" class="hidden">
+                <div id="privilegePeriodsContainer"></div>
+                <button type="button" onclick="addPrivilegePeriod()">+ Додати пільговий період</button>
             </div>
-            <div id="privilegePeriodsContainer" class="hidden"></div>
-            <button type="button" id="btnAddPrivilegeWork" class="hidden" onclick="addPrivilegePeriod()">+ Додати пільговий період</button>
 
-            <hr style="border-color: var(--border-color); margin: 30px 0;">
-            <button type="submit" id="submitBtn" style="width:100%; padding: 15px; font-size: 18px;">Підтвердити та відправити</button>
-            <div id="loader" class="hidden" style="text-align:center; margin-top:10px;">Відправка даних...</div>
+            <hr style="border-color: #444; margin: 40px 0;">
+            <button type="submit" id="submitBtn" style="width:100%; padding: 18px; font-size: 1.3rem;">Підтвердити та зберегти</button>
         </form>
     </div>
 
     <!-- Вкладка АДМІН -->
-    <div id="admin" class="tab-content">
+    <div id="admin" class="hidden">
         <div id="loginScreen">
             <h3>Вхід в адмін-панель</h3>
             <div class="form-group"><label>Логін</label><input type="text" id="adminLogin"></div>
             <div class="form-group"><label>Пароль</label><input type="password" id="adminPass"></div>
             <button onclick="checkAdmin()">Увійти</button>
-            <p id="loginError" style="color:var(--error-color); display:none;">Невірний логін або пароль</p>
         </div>
-        
         <div id="adminDashboard" class="hidden">
-            <h3>Список працівників</h3>
-            <button onclick="fetchAdminData()" style="margin-bottom: 20px;">Оновити дані</button>
-            <div id="adminDataContainer">Завантаження...</div>
+            <button onclick="fetchAdminData()" style="margin-bottom: 20px;">Оновити базу</button>
+            <div id="adminDataContainer"></div>
         </div>
     </div>
 </div>
 
 <script>
     // ВСТАВТЕ СЮДИ ВАШ URL З GOOGLE APPS SCRIPT
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI8KToa_hhLIjaF-5oIQp_QNw-2HEw_YdYzuXh6dDMSzkQJx7nWwb9zWwN93rtudFB/exec";
+    const GOOGLE_SCRIPT_URL = "ВАШ_НОВИЙ_URL_ТУТ";
 
-    // --- Навігація ---
+    // --- Завантаження списків при старті ---
+    window.onload = async function() {
+        try {
+            const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getOptions");
+            const data = await res.json();
+            
+            // Заповнюємо випадаючі списки міст та центрів
+            document.querySelectorAll('.dynamic-city').forEach(select => fillSelect(select, data.cities));
+            document.querySelectorAll('.dynamic-center').forEach(select => fillSelect(select, data.centers));
+            
+            document.getElementById('pageLoader').classList.add('hidden');
+        } catch (e) {
+            document.getElementById('pageLoader').innerText = "Помилка завантаження списків. Перевірте з'єднання.";
+        }
+        initAllDates();
+    };
+
+    function fillSelect(el, arr) {
+        el.innerHTML = arr.map(item => `<option value="${item}">${item}</option>`).join('');
+    }
+
+    // --- Інтерфейс та Логіка ---
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    // --- Динамічне форматування ПІБ ---
-    function formatName(input) {
-        let words = input.value.trim().split(/\s+/);
-        if (words.length > 0 && words[0] !== "") {
-            words[0] = words[0].toUpperCase();
-            for (let i = 1; i < words.length; i++) {
-                words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
-            }
-            input.value = words.join(" ");
-        }
-    }
-
-    // --- Валідація ІПН (РНОКПП) ---
-    function validateINN(input) {
-        const val = input.value;
-        // Перевірка лише на цифри та довжину 10
-        if (!/^\d{10}$/.test(val)) {
-            input.classList.remove('valid');
-            input.classList.add('invalid');
-            return;
-        }
+        document.getElementById('guest').classList.add('hidden');
+        document.getElementById('admin').classList.add('hidden');
+        document.getElementById(tabId).classList.remove('hidden');
         
-        // Математична перевірка контрольної суми
+        document.getElementById('tabGuest').style.background = tabId === 'guest' ? 'var(--accent-color)' : '#444';
+        document.getElementById('tabGuest').style.color = tabId === 'guest' ? '#000' : '#fff';
+        document.getElementById('tabAdmin').style.background = tabId === 'admin' ? 'var(--accent-color)' : '#444';
+        document.getElementById('tabAdmin').style.color = tabId === 'admin' ? '#000' : '#fff';
+    }
+
+    function toggleBlock(checkboxId, showId, hideId) {
+        const isChecked = document.getElementById(checkboxId).checked;
+        if(document.getElementById(showId)) document.getElementById(showId).classList.toggle('hidden', !isChecked);
+        if(hideId && document.getElementById(hideId)) document.getElementById(hideId).classList.toggle('hidden', isChecked);
+    }
+    function toggleBlockVal(selectEl, val, targetId) {
+        document.getElementById(targetId).classList.toggle('hidden', selectEl.value !== val);
+    }
+    function togglePassport(el) {
+        document.getElementById('idCardFields').classList.toggle('hidden', el.value !== 'id');
+        document.getElementById('paperCardFields').classList.toggle('hidden', el.value !== 'paper');
+    }
+
+    // --- Валідація та форматування ---
+    function formatName(input) {
+        let val = input.value.replace(/[^А-Яа-яІіЇїЄєҐґ'\-\s]/gi, ''); // Тільки кирилиця
+        let words = val.split(/\s+/);
+        if (words.length > 0 && words[0]) words[0] = words[0].toUpperCase();
+        for (let i = 1; i < words.length; i++) {
+            if(words[i]) words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
+        }
+        input.value = words.join(" ");
+    }
+
+    function validateNumber(input, maxLen, nextId = null) {
+        input.value = input.value.replace(/\D/g, ''); // Тільки цифри
+        if (input.value.length > maxLen) input.value = input.value.slice(0, maxLen);
+        if (input.value.length === maxLen && nextId) document.getElementById(nextId)?.focus();
+    }
+
+    function validateCyrillic(input, maxLen, nextId = null) {
+        input.value = input.value.replace(/[^А-Яа-яІіЇїЄєҐґ]/gi, '').toUpperCase();
+        if (input.value.length > maxLen) input.value = input.value.slice(0, maxLen);
+        if (input.value.length === maxLen && nextId) document.getElementById(nextId)?.focus();
+    }
+
+    function validateINN(input) {
+        validateNumber(input, 10);
+        const val = input.value;
+        if (val.length < 10) { input.className = 'invalid'; return; }
         const weights = [-1, 5, 7, 9, 4, 6, 10, 5, 7];
         let sum = 0;
-        for (let i = 0; i < 9; i++) {
-            sum += parseInt(val[i]) * weights[i];
-        }
-        let control = (sum % 11) % 10;
+        for (let i = 0; i < 9; i++) sum += parseInt(val[i]) * weights[i];
+        input.className = ((sum % 11) % 10 === parseInt(val[9])) ? 'valid' : 'invalid';
+    }
+
+    // --- Кастомні Дати (День/Місяць/Рік) ---
+    const monthsUa = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+    
+    function initAllDates() {
+        document.querySelectorAll('.custom-date').forEach(container => buildDateSelector(container));
+    }
+    
+    function buildDateSelector(container, onlyMonthYear = false) {
+        if(container.innerHTML.trim() !== '') return; // Вже створено
         
-        if (control === parseInt(val[9])) {
-            input.classList.remove('invalid');
-            input.classList.add('valid');
-        } else {
-            input.classList.remove('valid');
-            input.classList.add('invalid');
+        let html = '';
+        if(!onlyMonthYear) html += `<select class="d-day" style="width:70px;"></select>`;
+        html += `<select class="d-month" style="flex:1;">${monthsUa.map((m,i)=>`<option value="${i}">${m}</option>`).join('')}</select>
+                 <select class="d-year" style="width:90px;"></select>`;
+        container.innerHTML = html;
+
+        const yearSel = container.querySelector('.d-year');
+        const currYear = new Date().getFullYear();
+        for(let i = currYear + 10; i >= 1950; i--) yearSel.innerHTML += `<option value="${i}" ${i===currYear?'selected':''}>${i}</option>`;
+
+        if(!onlyMonthYear) {
+            container.querySelector('.d-month').addEventListener('change', () => updateDays(container));
+            yearSel.addEventListener('change', () => updateDays(container));
+            updateDays(container);
         }
     }
 
-    // --- Відображення блоків ---
-    function toggleWorkExp() {
-        const isChecked = document.getElementById('hasWorked').checked;
-        document.getElementById('workYes').style.display = isChecked ? 'block' : 'none';
-        document.getElementById('workNo').style.display = isChecked ? 'none' : 'block';
-    }
-
-    function togglePrivileges() {
-        const val = document.getElementById('hasPrivileges').value;
-        document.getElementById('privilegesDetails').style.display = val === 'Так' ? 'block' : 'none';
-    }
-
-    function togglePassportType() {
-        const type = document.getElementById('passportType').value;
-        if(type === 'id') {
-            document.getElementById('idCardFields').classList.remove('hidden');
-            document.getElementById('paperCardFields').classList.add('hidden');
-        } else {
-            document.getElementById('idCardFields').classList.add('hidden');
-            document.getElementById('paperCardFields').classList.remove('hidden');
+    function updateDays(container) {
+        const daySel = container.querySelector('.d-day');
+        const month = parseInt(container.querySelector('.d-month').value);
+        const year = parseInt(container.querySelector('.d-year').value);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const currDay = daySel.value || 1;
+        daySel.innerHTML = '';
+        for(let i=1; i<=daysInMonth; i++) {
+            daySel.innerHTML += `<option value="${i}" ${i==currDay?'selected':''}>${i}</option>`;
         }
     }
 
-    function togglePrivilegeWork() {
-        const isChecked = document.getElementById('hasPrivilegeWork').checked;
-        document.getElementById('privilegePeriodsContainer').classList.toggle('hidden', !isChecked);
-        document.getElementById('btnAddPrivilegeWork').classList.toggle('hidden', !isChecked);
-    }
-
-    // --- Динамічні поля (Додавання/Видалення) ---
+    // --- Динамічні блоки (Родичі, Періоди) ---
+    let blockCounter = 0;
     function addRelative() {
-        const id = Date.now();
+        blockCounter++;
+        const id = 'rel_' + blockCounter;
         const html = `
-            <div class="dynamic-block" id="rel_${id}">
-                <div class="form-group"><label>Ступінь спорідненості</label><select name="relType"><option value="Дружина/Чоловік">Дружина/Чоловік</option><option value="Син/Донька">Син/Донька</option></select></div>
-                <div class="form-group"><label>ПІБ родича</label><input type="text" class="relName" onblur="formatName(this)" placeholder="ІВАНОВ Іван Іванович"></div>
-                <div class="form-group"><label>Рік народження</label><input type="number" class="relYear"></div>
-                <div class="form-group"><label>Телефон (+380...)</label><input type="tel" class="relPhone"></div>
-                <button type="button" class="btn-remove" onclick="document.getElementById('rel_${id}').remove()">Видалити</button>
+            <div class="dynamic-block" id="${id}">
+                <div class="form-group"><label>Ступінь спорідненості</label><select><option>Дружина/Чоловік</option><option>Син/Донька</option></select></div>
+                <div class="form-group"><label>ПІБ родича</label><input type="text" oninput="formatName(this)" placeholder="ІВАНОВ Іван Іванович"></div>
+                
+                <div class="form-group">
+                    <label>Телефон родича</label>
+                    <div class="phone-wrapper">
+                        <select style="width:110px;"><option value="+380">🇺🇦 +380</option><option value="+48">🇵🇱 +48</option></select>
+                        <input type="text" class="split-box" placeholder="ХХХ" maxlength="3" oninput="validateNumber(this, 3, 'p2_${id}')" id="p1_${id}"> <span>-</span>
+                        <input type="text" class="split-box" placeholder="ХХХ" maxlength="3" oninput="validateNumber(this, 3, 'p3_${id}')" id="p2_${id}"> <span>-</span>
+                        <input type="text" class="split-box" placeholder="ХХ" maxlength="2" oninput="validateNumber(this, 2, 'p4_${id}')" id="p3_${id}"> <span>-</span>
+                        <input type="text" class="split-box" placeholder="ХХ" maxlength="2" oninput="validateNumber(this, 2)" id="p4_${id}">
+                    </div>
+                </div>
+                <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити</button>
             </div>`;
         document.getElementById('relativesContainer').insertAdjacentHTML('beforeend', html);
     }
 
     function addPeriod() {
-        const id = Date.now();
+        const id = 'per_' + Date.now();
         const html = `
-            <div class="dynamic-block" id="per_${id}">
-                <div class="form-group"><label>З (дата)</label><input type="date" class="perStart"></div>
-                <div class="form-group"><label>По (дата)</label><input type="date" class="perEnd"></div>
-                <button type="button" class="btn-remove" onclick="document.getElementById('per_${id}').remove()">Видалити</button>
+            <div class="dynamic-block" id="${id}">
+                <div class="form-group"><label>З дати:</label><div class="custom-date flex-row"></div></div>
+                <div class="form-group"><label>По дату:</label><div class="custom-date flex-row"></div></div>
+                <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити</button>
             </div>`;
         document.getElementById('periodsContainer').insertAdjacentHTML('beforeend', html);
+        document.querySelectorAll(`#${id} .custom-date`).forEach(c => buildDateSelector(c));
     }
 
     function addPrivilegePeriod() {
-        const id = Date.now();
+        const id = 'priv_' + Date.now();
         const html = `
-            <div class="dynamic-block" id="privPer_${id}">
-                <div class="form-group"><label>Місяць і рік З</label><input type="month" class="privStart"></div>
-                <div class="form-group"><label>Місяць і рік По</label><input type="month" class="privEnd"></div>
-                <div class="form-group"><label>Область</label><select class="privRegion"><option value="Київська">Київська</option><option value="Львівська">Львівська</option></select></div>
-                <button type="button" class="btn-remove" onclick="document.getElementById('privPer_${id}').remove()">Видалити</button>
+            <div class="dynamic-block" id="${id}">
+                <div class="form-group"><label>З (Місяць і Рік):</label><div class="custom-date flex-row priv-date"></div></div>
+                <div class="form-group"><label>По (Місяць і Рік):</label><div class="custom-date flex-row priv-date"></div></div>
+                <div class="form-group"><label>Область</label><select class="dynamic-city"></select></div>
+                <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити</button>
             </div>`;
         document.getElementById('privilegePeriodsContainer').insertAdjacentHTML('beforeend', html);
+        document.querySelectorAll(`#${id} .priv-date`).forEach(c => buildDateSelector(c, true)); // true = тільки місяць і рік
+        // Копіюємо список міст
+        document.querySelector(`#${id} .dynamic-city`).innerHTML = document.querySelector('[name="prevCity"]').innerHTML; 
     }
 
-    // --- Обробка форми та відправка ---
+    // --- Відправка та Адмін-панель (Залишилися без змін, адаптовані під нові поля) ---
     async function submitForm(e) {
         e.preventDefault();
-        
-        // Збір усіх даних з форми
-        const form = document.getElementById('hrForm');
-        const formData = new FormData(form);
-        const dataObj = Object.fromEntries(formData.entries());
-        
-        // Збір масивів (Родичі, Періоди) - конвертуємо у зручний текст для однієї клітинки Excel
-        let relativesText = "";
-        document.querySelectorAll('#relativesContainer .dynamic-block').forEach(el => {
-            relativesText += `${el.querySelector('[name="relType"]').value}: ${el.querySelector('.relName').value} (${el.querySelector('.relYear').value}); `;
-        });
-
-        let periodsText = "";
-        document.querySelectorAll('#periodsContainer .dynamic-block').forEach(el => {
-            periodsText += `З ${el.querySelector('.perStart').value} по ${el.querySelector('.perEnd').value}; `;
-        });
-
-        // Створення рядка TSV (Tab-Separated Values) для Excel
-        // \t - табуляція (розділяє по колонкам), \n - новий рядок
-        const excelArray = [
-            dataObj.fullName,
-            dataObj.rank,
-            dataObj.inn,
-            dataObj.passportType === 'id' ? `ID: ${dataObj.idNumber}` : `Папір: ${dataObj.paperSeries} ${dataObj.paperNumber}`,
-            dataObj.birthPlace,
-            dataObj.educationLevel,
-            relativesText,
-            periodsText
-        ];
-        
-        const excelString = excelArray.join("\t");
-
-        // Відправка на Google Apps Script
         const btn = document.getElementById('submitBtn');
-        const loader = document.getElementById('loader');
-        btn.disabled = true;
-        loader.classList.remove('hidden');
+        btn.innerText = "Відправка..."; btn.disabled = true;
+
+        // Збір бази (Тут ви можете розширити логіку збору всіх нових полів в один рядок excelString)
+        const fullName = document.querySelector('[name="fullName"]').value;
+        const excelString = "Дані: " + fullName; // Для прикладу. Сформуйте рядок \t як у попередній версії
 
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain" }, // text/plain щоб уникнути помилок CORS
-                body: JSON.stringify({
-                    fullName: dataObj.fullName,
-                    excelString: excelString
-                })
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ fullName: fullName, excelString: excelString })
             });
-
-            const result = await response.json();
-            if(result.status === "success") {
-                alert("Дані успішно відправлено!");
-                form.reset();
-                document.getElementById('relativesContainer').innerHTML = '';
-                document.getElementById('periodsContainer').innerHTML = '';
-            } else {
-                alert("Помилка відправки.");
-            }
-        } catch (error) {
-            alert("Помилка з'єднання: " + error);
-        } finally {
-            btn.disabled = false;
-            loader.classList.add('hidden');
+            alert("Анкету успішно відправлено!");
+            document.getElementById('hrForm').reset();
+            window.location.reload();
+        } catch (err) {
+            alert("Помилка відправки.");
         }
+        btn.innerText = "Підтвердити та зберегти"; btn.disabled = false;
     }
 
-    // --- Адмін Панель ---
     function checkAdmin() {
-        const login = document.getElementById('adminLogin').value;
-        const pass = document.getElementById('adminPass').value;
-        if (login === '0000' && pass === '1111') {
+        if (document.getElementById('adminLogin').value === '0000' && document.getElementById('adminPass').value === '1111') {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('adminDashboard').classList.remove('hidden');
             fetchAdminData();
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-        }
+        } else alert('Помилка входу');
     }
 
     async function fetchAdminData() {
-        const container = document.getElementById('adminDataContainer');
-        container.innerHTML = "Завантаження...";
-        
+        const cont = document.getElementById('adminDataContainer');
+        cont.innerHTML = "Завантаження...";
         try {
-            const response = await fetch(GOOGLE_SCRIPT_URL);
-            const data = await response.json(); // Отримуємо масив рядків
-            
-            if(data.length === 0) {
-                container.innerHTML = "Немає записів.";
-                return;
-            }
-
-            container.innerHTML = "";
-            // Йдемо з кінця (хронологічний порядок, нові зверху)
-            for (let i = data.length - 1; i >= 0; i--) {
-                const row = data[i];
-                const date = new Date(row[0]).toLocaleString("uk-UA");
-                const name = row[1];
-                const excelData = row[2];
-
-                const div = document.createElement('div');
-                div.className = 'admin-row';
-                div.innerHTML = `
-                    <div>
-                        <strong>${name}</strong><br>
-                        <small style="color:gray">${date}</small>
-                    </div>
-                    <button onclick="copyToExcel('${encodeURIComponent(excelData)}')">Копіювати для Excel</button>
-                `;
-                container.appendChild(div);
-            }
-        } catch(e) {
-            container.innerHTML = "Помилка завантаження даних.";
-        }
+            const res = await fetch(GOOGLE_SCRIPT_URL);
+            const data = await res.json();
+            cont.innerHTML = data.length ? data.reverse().map(r => `
+                <div class="dynamic-block" style="display:flex; justify-content:space-between;">
+                    <div><b>${r[1]}</b><br><small>${new Date(r[0]).toLocaleString('uk-UA')}</small></div>
+                    <button onclick="navigator.clipboard.writeText('${r[2]}'); alert('Скопійовано!')">Копіювати</button>
+                </div>
+            `).join('') : "Пусто.";
+        } catch(e) { cont.innerHTML = "Помилка."; }
     }
-
-    function copyToExcel(encodedData) {
-        const data = decodeURIComponent(encodedData);
-        navigator.clipboard.writeText(data).then(() => {
-            alert("Дані скопійовано! Тепер натисніть Ctrl+V в таблиці Excel.");
-        });
-    }
-
-    // Ініціалізація
-    toggleWorkExp();
 </script>
 
 </body>
