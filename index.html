@@ -435,73 +435,82 @@
         return str;
     }
 
-    async function submitForm(e) {
+async function submitForm(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.innerText = "Відправка..."; btn.disabled = true;
 
         try {
-            // --- Формування даних для Excel ---
-            let arr = new Array(32).fill("");
+            // Розмір масиву зменшено на 1 через видалення табуляції
+            let arr = new Array(31).fill("");
             
             arr[0] = document.querySelector('[name="rank"]')?.value || "";
             arr[1] = document.querySelector('[name="fullName"]')?.value || "";
 
-            arr[6] = document.getElementById('hasWorked')?.checked ? 
+            // Попереднє місце роботи зміщено на 1 клітинку ліворуч (індекс 5 замість 6)
+            arr[5] = document.getElementById('hasWorked')?.checked ? 
                      `${document.querySelector('[name="prevZip"]')?.value || ""}, ${document.querySelector('[name="prevCity"]')?.value || ""}` : "Не працював";
             
             let t = new Date();
-            arr[7] = `${t.getDate().toString().padStart(2,'0')}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getFullYear()}`;
+            arr[6] = `${t.getDate().toString().padStart(2,'0')}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getFullYear()}`;
 
             let priv = document.querySelector('[name="hasPrivileges"]')?.value;
             if (priv === "Так") {
-                arr[18] = "є";
-                arr[19] = getDateStr(document.getElementById('privDateContainer'));
+                arr[17] = "є";
+                arr[18] = getDateStr(document.getElementById('privDateContainer'));
                 let dur = document.querySelector('[name="privilegeDuration"]')?.value;
                 if (dur === "безтерміново") {
-                    arr[20] = "безстроковий";
+                    arr[19] = "безстроковий";
                 } else {
                     let pY = parseInt(document.querySelector('#privDateContainer .d-year')?.value || 0);
                     let addY = dur === "1 рік" ? 1 : (dur === "3 роки" ? 3 : 5);
-                    arr[20] = arr[19] ? arr[19].replace(pY.toString(), (pY + addY).toString()) : "";
+                    arr[19] = arr[18] ? arr[18].replace(pY.toString(), (pY + addY).toString()) : "";
                 }
             } else {
-                arr[18] = "відсутні";
+                arr[17] = "відсутні";
             }
 
             let inn = document.getElementById('innInput')?.value || "";
             let noInn = document.getElementById('noInn')?.checked;
             
             if (noInn) {
-                arr[24] = getDateStr(document.getElementById('dobContainer'));
-                arr[26] = document.querySelector('[name="noInnGender"]')?.value || "";
+                arr[23] = getDateStr(document.getElementById('dobContainer'));
+                arr[25] = document.querySelector('[name="noInnGender"]')?.value || "";
             } else {
-                arr[21] = inn;
+                arr[20] = inn;
                 if (inn.length === 10) {
                     let days = parseInt(inn.substring(0, 5));
                     if (!isNaN(days)) {
-                        let d = new Date(1899, 11, 31);
+                        // Виправлення багу дати: встановлюємо базовий час на 12:00, щоб уникнути стрибків часових поясів
+                        let d = new Date(1899, 11, 31, 12, 0, 0); 
                         d.setDate(d.getDate() + days - 1);
-                        arr[24] = `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
-                        arr[26] = parseInt(inn.charAt(8)) % 2 === 0 ? 'Ж' : 'Ч';
+                        arr[23] = `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+                        arr[25] = parseInt(inn.charAt(8)) % 2 === 0 ? 'Ж' : 'Ч';
                     }
                 }
             }
 
             let pt = document.querySelector('[name="passportType"]')?.value;
-            if (pt === "id") arr[23] = document.querySelector('[name="idNumber"]')?.value || "";
-            else arr[22] = (document.querySelector('[name="paperSeries"]')?.value || "") + " " + (document.querySelector('[name="paperNumber"]')?.value || "");
+            // Номер паспорта зміщено на клітинку ліворуч (індекс 21)
+            // На старе місце додано тип паспорта (індекс 22)
+            if (pt === "id") {
+                arr[21] = document.querySelector('[name="idNumber"]')?.value || "";
+                arr[22] = "ID-картка";
+            } else {
+                arr[21] = (document.querySelector('[name="paperSeries"]')?.value || "") + " " + (document.querySelector('[name="paperNumber"]')?.value || "");
+                arr[22] = "Паперовий";
+            }
 
-            arr[25] = document.querySelector('[name="birthPlace"]')?.value || "";
-            arr[27] = document.querySelector('[name="addCenter"]')?.value || "";
-            arr[28] = getDateStr(document.getElementById('addCenterDate'));
+            arr[24] = document.querySelector('[name="birthPlace"]')?.value || "";
+            arr[26] = document.querySelector('[name="addCenter"]')?.value || "";
+            arr[27] = getDateStr(document.getElementById('addCenterDate'));
 
             let eLvl = document.querySelector('[name="educationLevel"]')?.value || "";
             let eUni = document.querySelector('[name="university"]')?.value || "";
             let eCity = document.querySelector('[name="universityCity"]')?.value || "";
             let eYear = document.querySelector('[name="gradYear"]')?.value || "";
             let eSpec = document.querySelector('[name="specialty"]')?.value || "";
-            arr[29] = `${eLvl}\n${eUni}, ${eCity} у ${eYear} р.\n${eSpec}`;
+            arr[28] = `${eLvl}\n${eUni}, ${eCity} у ${eYear} р.\n${eSpec}`;
 
             let relStr = [], phStr = [];
             document.querySelectorAll('#relativesContainer .dynamic-block').forEach(b => {
@@ -516,10 +525,10 @@
                     if(pN) phStr.push(`${kin}: ${pC}${pN}`);
                 }
             });
-            arr[30] = relStr.join('\n');
+            arr[29] = relStr.join('\n');
             
             phStr.push(`Особистий номер: ${document.querySelector('[name="mainPhoneCode"]')?.value || ""}${document.querySelector('[name="mainPhone"]')?.value || ""}`);
-            arr[31] = phStr.join('\n');
+            arr[30] = phStr.join('\n');
 
             const excelString = arr.map(escapeTSV).join('\t');
 
@@ -538,7 +547,7 @@
             window.location.reload();
 
         } catch (err) { 
-            console.error("Деталі помилки: ", err); // Тепер помилка детально виведеться в консоль
+            console.error(err); 
             alert("Помилка відправки. Перевірте консоль (F12) для деталей."); 
         } finally {
             btn.innerText = "Підтвердити та зберегти"; btn.disabled = false;
