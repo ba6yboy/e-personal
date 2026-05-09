@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Відділ кадрів</title>
+    <title>ППОС</title>
     <style>
         :root {
             --bg-color: #121212; --container-bg: #1e1e1e; --text-color: #f1f1f1;
@@ -56,7 +56,7 @@
 
 <div class="container">
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button id="tabGuest" onclick="switchTab('guest')" style="flex:1;">Гість</button>
+        <button id="tabGuest" onclick="switchTab('guest')" style="flex:1;">Користувач</button>
         <button id="tabAdmin" onclick="switchTab('admin')" style="flex:1; background:#444; color:#fff;">Адмін</button>
     </div>
 
@@ -75,14 +75,14 @@
             <h3>Загальні відомості</h3>
             <div class="desktop-row">
                 <div class="form-group">
-                    <label>Розряд робітника</label>
+                    <label>Військове звання</label>
                     <select name="rank">
                         <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                         <option value="4">4</option><option value="5">5</option><option value="6">6</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Телефон (основний)</label>
+                    <label>Телефон (в форматі 095-123-45-67)</label>
                     <div class="flex-row" style="flex-wrap: nowrap;">
                         <input type="text" list="countriesList" name="mainPhoneCode" placeholder="Країна..." style="width: 140px;" autocomplete="off">
                         <input type="text" name="mainPhone" oninput="validateNumber(this, 15)" placeholder="Номер..." autocomplete="off">
@@ -95,32 +95,32 @@
                 <input type="text" name="fullName" oninput="formatName(this)" required placeholder="ІВАНОВ Іван Іванович">
             </div>
 
-            <h3>Робочий стаж</h3>
+            <h3>Проходження військової служби</h3>
             <label class="checkbox-group">
                 <input type="checkbox" id="hasWorked" onchange="toggleBlock('hasWorked', 'workYes', 'workNo')">
-                <span>Чи працювала людина до цього?</span>
+                <span>Переведений з іншої в/ч</span>
             </label>
             
             <div id="workYes" class="hidden dynamic-block desktop-row">
-                <div class="form-group"><label>Індекс (5 цифр)</label><input type="text" name="prevZip" oninput="validateNumber(this, 5)"></div>
-                <div class="form-group"><label>Населений пункт компанії</label><input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off"></div>
+                <div class="form-group"><label>Військова частина (в форматі А0000)</label><input type="text" name="prevZip" oninput="validateZip(this)" maxlength="5" autocomplete="off"></div>
+                <div class="form-group"><label>Населений пункт розташування частини</label><input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off"></div>
             </div>
-            <div id="workNo" class="dynamic-block"><div class="form-group"><label>Раніше не працював (відсутнє попереднє місце роботи)</label></div></div>
+            <div id="workNo" class="dynamic-block"><div class="form-group"><label>Не служив</label></div></div>
 
             <div class="desktop-row">
                 <div class="form-group">
-                    <label>Наявність пільгових категорій</label>
-                    <select name="hasPrivileges" onchange="toggleBlockVal(this, 'Так', 'privilegesDetails')">
-                        <option value="Ні">Ні</option><option value="Так">Так</option>
+                    <label>Вид військової служби</label>
+                    <select name="hasPrivileges" onchange="toggleBlockVal(this, 'контракт', 'privilegesDetails')">
+                        <option value="мобілізація">За мобілізацією</option><option value="контракт">За контрактом</option>
                     </select>
                 </div>
             </div>
 
             <div id="privilegesDetails" class="hidden dynamic-block desktop-row">
-                <div class="form-group"><label>Дата надання пільгової категорії</label><div class="custom-date flex-row" id="privDateContainer"></div></div>
+                <div class="form-group"><label>Дата укладання контракту</label><div class="custom-date flex-row" id="privDateContainer"></div></div>
                 <div class="form-group">
-                    <label>Термін дії</label>
-                    <select name="privilegeDuration"><option>1 рік</option><option>3 роки</option><option>5 років</option><option value="безтерміново">безтерміново</option></select>
+                    <label>Термін контракту</label>
+                    <select name="privilegeDuration"><option>1 рік</option><option>3 роки</option><option>5 років</option><option value="до оголошення демобілізації">До оголошення демобілізації</option></select>
                 </div>
             </div>
 
@@ -194,7 +194,7 @@
             </div>
             <div class="desktop-row">
                 <div class="form-group"><label>Навчальний заклад</label><input type="text" name="university"></div>
-                <div class="form-group"><label>Населений пункт закладу</label><input type="text" list="citiesList" name="universityCity" autocomplete="off"></div>
+                <div class="form-group"><label>Населений пункт навчального закладу</label><input type="text" list="citiesList" name="universityCity" autocomplete="off"></div>
             </div>
             <div class="form-group"><label>Спеціальність</label><input type="text" name="specialty"></div>
 
@@ -208,25 +208,25 @@
             <h3>Додаткова інформація</h3>
             <div class="dynamic-block desktop-row">
                 <div class="form-group">
-                    <label>Де перебуває на обліку (Центр зайнятості/ТЦК)</label>
+                    <label>Яким ТЦК призваний</label>
                     <input type="text" list="centersList" name="addCenter" autocomplete="off" placeholder="Введіть або оберіть...">
                 </div>
                 <div class="form-group">
-                    <label>Дата прийняття на облік</label>
+                    <label>Дата призову</label>
                     <div class="custom-date flex-row" id="addCenterDate"></div>
                 </div>
             </div>
 
             <div id="periodsContainer"></div>
-            <button type="button" onclick="addPeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати період роботи</button>
+            <button type="button" onclick="addPeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати період служби</button>
 
             <label class="checkbox-group" style="margin-top:25px;">
                 <input type="checkbox" id="hasPrivilegeWork" onchange="toggleBlock('hasPrivilegeWork', 'privilegePeriodsWrapper')">
-                <span>Чи працювала людина на пільгових умовах?</span>
+                <span>Періоди участі АТО/ООС</span>
             </label>
             <div id="privilegePeriodsWrapper" class="hidden">
                 <div id="privilegePeriodsContainer"></div>
-                <button type="button" onclick="addPrivilegePeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати пільговий період</button>
+                <button type="button" onclick="addPrivilegePeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати період</button>
             </div>
 
             <hr style="border-color: #444; margin: 40px 0;">
@@ -339,6 +339,27 @@
         input.className = ((sum % 11) % 10 === parseInt(val[9])) ? 'valid' : 'invalid';
     }
 
+    function validateZip(input) {
+        // Дозволяємо лише літери (кирилиця/латиниця) та цифри. Автоматично робимо великими.
+        input.value = input.value.toUpperCase().replace(/[^А-ЯІЇЄҐA-Z0-9]/g, '');
+        
+        // Перевіряємо за вашим правилом: 4 цифри (^\d{4}$) АБО 1 літера і 4 цифри (^([А-ЯІЇЄҐA-Z])\d{4}$)
+        const isValidFormat = /^([А-ЯІЇЄҐA-Z])?\d{4}$/.test(input.value);
+        
+        if (input.value.length >= 4) {
+            if (isValidFormat) {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            } else {
+                input.classList.remove('valid');
+                input.classList.add('invalid');
+            }
+        } else {
+            // Якщо ще не дописали, прибираємо підсвітку
+            input.classList.remove('invalid', 'valid');
+        }
+    }
+
     // Дати
     const monthsUa = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
     
@@ -448,8 +469,10 @@ async function submitForm(e) {
             arr[1] = document.querySelector('[name="fullName"]')?.value || "";
 
             // Попереднє місце роботи зміщено на 1 клітинку ліворуч (індекс 5 замість 6)
+            // Якщо працював - беремо індекс та місто. Якщо ні - беремо центр зайнятості
             arr[5] = document.getElementById('hasWorked')?.checked ? 
-                     `${document.querySelector('[name="prevZip"]')?.value || ""}, ${document.querySelector('[name="prevCity"]')?.value || ""}` : "Не працював";
+                     `${document.querySelector('[name="prevZip"]')?.value || ""}, ${document.querySelector('[name="prevCity"]')?.value || ""}` : 
+                     (document.querySelector('[name="employmentCenter"]')?.value || "Не перебуває на обліку");
             
             let t = new Date();
             arr[6] = `${t.getDate().toString().padStart(2,'0')}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getFullYear()}`;
@@ -459,8 +482,8 @@ async function submitForm(e) {
                 arr[17] = "є";
                 arr[18] = getDateStr(document.getElementById('privDateContainer'));
                 let dur = document.querySelector('[name="privilegeDuration"]')?.value;
-                if (dur === "безтерміново") {
-                    arr[19] = "безстроковий";
+                if (dur === "до оголошення демобілізації") {
+                    arr[19] = "до оголошення демобілізації";
                 } else {
                     let pY = parseInt(document.querySelector('#privDateContainer .d-year')?.value || 0);
                     let addY = dur === "1 рік" ? 1 : (dur === "3 роки" ? 3 : 5);
