@@ -443,8 +443,34 @@
         document.getElementById(`deceased_${blockId}`).classList.toggle('hidden', !isDeceased);
     }
 
-    function addPeriod() { /* ... код залишається таким самим ... */ }
-    function addPrivilegePeriod() { /* ... код залишається таким самим ... */ }
+function addPeriod() {
+        const id = 'per_' + Date.now();
+        const html = `
+            <div class="dynamic-block desktop-row" id="${id}">
+                <div class="form-group"><label>З дати:</label><div class="custom-date flex-row"></div></div>
+                <div class="form-group"><label>По дату:</label><div class="custom-date flex-row"></div></div>
+                <div style="display:flex; align-items:flex-end; padding-bottom:20px;">
+                    <button type="button" class="btn-remove" style="margin:0;" onclick="document.getElementById('${id}').remove()">✕</button>
+                </div>
+            </div>`;
+        document.getElementById('periodsContainer').insertAdjacentHTML('beforeend', html);
+        document.querySelectorAll(`#${id} .custom-date`).forEach(c => buildDateSelector(c));
+    }
+
+    function addPrivilegePeriod() {
+        const id = 'priv_' + Date.now();
+        const html = `
+            <div class="dynamic-block desktop-row" id="${id}">
+                <div class="form-group"><label>З (Місяць/Рік):</label><div class="custom-date flex-row priv-date"></div></div>
+                <div class="form-group"><label>По (Місяць/Рік):</label><div class="custom-date flex-row priv-date"></div></div>
+                <div class="form-group"><label>Область</label><input type="text" list="citiesList" autocomplete="off"></div>
+                <div style="display:flex; align-items:flex-end; padding-bottom:20px;">
+                    <button type="button" class="btn-remove" style="margin:0;" onclick="document.getElementById('${id}').remove()">✕</button>
+                </div>
+            </div>`;
+        document.getElementById('privilegePeriodsContainer').insertAdjacentHTML('beforeend', html);
+        document.querySelectorAll(`#${id} .priv-date`).forEach(c => buildDateSelector(c, true));
+    }
 
     // Екранування для правильного перенесення рядків (Alt+Enter) в Excel
     function escapeTSV(str) {
@@ -472,7 +498,7 @@ async function submitForm(e) {
             // Якщо працював - беремо індекс та місто. Якщо ні - беремо центр зайнятості
             arr[5] = document.getElementById('hasWorked')?.checked ? 
                      `${document.querySelector('[name="prevZip"]')?.value || ""}, ${document.querySelector('[name="prevCity"]')?.value || ""}` : 
-                     (document.querySelector('[name="employmentCenter"]')?.value || "Не перебуває на обліку");
+                     (document.querySelector('[name="addCenter"]')?.value || "Не перебуває на обліку");
             
             let t = new Date();
             arr[6] = `${t.getDate().toString().padStart(2,'0')}.${(t.getMonth()+1).toString().padStart(2,'0')}.${t.getFullYear()}`;
