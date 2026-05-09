@@ -483,7 +483,7 @@ async function submitForm(e) {
                     if (!isNaN(days)) {
                         // Виправлення багу дати: встановлюємо базовий час на 12:00, щоб уникнути стрибків часових поясів
                         let d = new Date(1899, 11, 31, 12, 0, 0); 
-                        d.setDate(d.getDate() + days - 1);
+                        d.setDate(d.getDate() + days);
                         arr[23] = `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
                         arr[25] = parseInt(inn.charAt(8)) % 2 === 0 ? 'Ж' : 'Ч';
                     }
