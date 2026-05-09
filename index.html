@@ -624,21 +624,46 @@
         }
     }
 
-    function renderAdminData(data) {
+function renderAdminData(data) {
         const cont = document.getElementById('adminDataContainer');
         
-        // Якщо база (data) складається лише з 1 порожнього рядка або взагалі порожня
+        // Якщо база порожня
         if (!data || data.length === 0 || (data.length === 1 && data[0][0] === "")) {
             cont.innerHTML = "База порожня.";
             return;
         }
 
-        cont.innerHTML = data.reverse().map(r => `
+        cont.innerHTML = data.reverse().map(r => {
+            // Надійно кодуємо всі спецсимволи (перенесення рядків, лапки, табуляції)
+            // Щоб вони не зламали HTML код кнопки
+            const safeData = encodeURIComponent(r[2]).replace(/'/g, "%27");
+            
+            return `
             <div class="dynamic-block" style="display:flex; justify-content:space-between; align-items: center;">
-                <div><b>${r[1]}</b><br><small style="color:var(--accent-color)">${new Date(r[0]).toLocaleString('uk-UA')}</small></div>
-                <button onclick="navigator.clipboard.writeText('${r[2].replace(/'/g, "\\'")}'); alert('Скопійовано!')">Копіювати</button>
+                <div>
+                    <b>${r[1]}</b><br>
+                    <small style="color:var(--accent-color)">${new Date(r[0]).toLocaleString('uk-UA')}</small>
+                </div>
+                <button onclick="copyToExcel('${safeData}')">Копіювати</button>
             </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    // Нова функція для розкодування та копіювання
+    function copyToExcel(encodedData) {
+        try {
+            // Розкодовуємо дані назад у нормальний текст
+            const textToCopy = decodeURIComponent(encodedData);
+            
+            // Записуємо в буфер обміну
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("Дані скопійовано! Тепер вставте їх у таблицю Excel.");
+            });
+        } catch (err) {
+            alert("Не вдалося скопіювати дані.");
+            console.error(err);
+        }
     }
 </script>
 
