@@ -67,12 +67,13 @@
         <button id="tabAdmin" onclick="switchTab('admin')" style="flex:1; background:#444; color:#fff;">Адмін</button>
     </div>
 
-    <div id="pageLoader">Завантаження бази населених пунктів та кодів...</div>
+    <div id="pageLoader">Завантаження бази даних...</div>
 
     <!-- Datalists для динамічного пошуку -->
     <datalist id="citiesList"></datalist>
     <datalist id="centersList"></datalist>
     <datalist id="countriesList"></datalist>
+    <datalist id="kinshipsList"></datalist>
     <datalist id="yearsList"></datalist>
 
     <!-- Вкладка ГІСТЬ -->
@@ -248,7 +249,7 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-7y6K7CPGSWbfVZLPTR7qwthwWj-7Lcrk8mNABjThJBpJCO6fsYtUQUqWTAKZdB8s/exec"; 
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-7y6K7CPGSWbfVZLPTR7qwthwWj-7Lcrk8mNABjThJBpJCO6fsYtUQUqWTAKZdB8s/exec";
 
     window.onload = async function() {
         populateYears();
@@ -259,6 +260,7 @@
             fillDatalist('citiesList', data.cities);
             fillDatalist('centersList', data.centers);
             fillDatalist('countriesList', data.countries);
+            fillDatalist('kinshipsList', data.kinships); // Завантаження нового списку родичів
             
             document.getElementById('pageLoader').classList.add('hidden');
         } catch (e) {
@@ -270,7 +272,7 @@
     function populateYears() {
         const yearList = document.getElementById('yearsList');
         const currYear = new Date().getFullYear();
-        for(let i = currYear; i >= 1950; i--) {
+        for(let i = currYear; i >= 1900; i--) {
             yearList.innerHTML += `<option value="${i}">`;
         }
     }
@@ -353,7 +355,6 @@
         input.className = ((sum % 11) % 10 === parseInt(val[9])) ? 'valid' : 'invalid';
     }
 
-    // Дати
     const monthsUa = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
     
     function initAllDates() {
@@ -389,24 +390,37 @@
         const currDay = daySel.value || 1;
         daySel.innerHTML = '';
         for(let i=1; i<=daysInMonth; i++) {
-            // Додаємо провідний нуль для чисел 1-9
             let displayDay = i.toString().padStart(2, '0');
             daySel.innerHTML += `<option value="${i}" ${i==currDay?'selected':''}>${displayDay}</option>`;
         }
     }
 
-    // Динамічні блоки
+    // НОВА ЛОГІКА ДЛЯ БЛОКУ РОДИЧІВ
     let blockCounter = 0;
+    
     function addRelative() {
         blockCounter++;
         const id = 'rel_' + blockCounter;
         const html = `
             <div class="dynamic-block" id="${id}">
                 <div class="desktop-row">
-                    <div class="form-group"><label>Ступінь спорідненості</label><select><option>Дружина/Чоловік</option><option>Син/Донька</option></select></div>
-                    <div class="form-group"><label>ПІБ родича</label><input type="text" oninput="formatName(this)" placeholder="ІВАНОВ Іван Іванович"></div>
+                    <div class="form-group">
+                        <label>Ступінь спорідненості</label>
+                        <input type="text" list="kinshipsList" placeholder="Оберіть або введіть..." autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>ПІБ родича</label>
+                        <input type="text" oninput="formatName(this)" placeholder="ІВАНОВ Іван Іванович">
+                    </div>
                 </div>
-                <div class="desktop-row">
+
+                <label class="checkbox-group" style="margin-bottom: 20px;">
+                    <input type="checkbox" onchange="toggleDeceased('${id}')">
+                    <span style="color: var(--error-color);">Родич помер</span>
+                </label>
+
+                <!-- Поля для живого родича -->
+                <div id="alive_${id}" class="desktop-row">
                     <div class="form-group"><label>Рік народження</label><input type="text" list="yearsList" autocomplete="off"></div>
                     <div class="form-group">
                         <label>Телефон родича</label>
@@ -416,9 +430,22 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити</button>
+
+                <!-- Поля для померлого родича (приховані за замовчуванням) -->
+                <div id="deceased_${id}" class="hidden desktop-row">
+                    <div class="form-group"><label>Рік смерті</label><input type="text" list="yearsList" autocomplete="off"></div>
+                    <div class="form-group"><label>Місце поховання</label><input type="text" list="citiesList" placeholder="Місто або село..." autocomplete="off"></div>
+                </div>
+
+                <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити запис</button>
             </div>`;
         document.getElementById('relativesContainer').insertAdjacentHTML('beforeend', html);
+    }
+
+    function toggleDeceased(blockId) {
+        const isDeceased = document.querySelector(`#${blockId} input[type="checkbox"]`).checked;
+        document.getElementById(`alive_${blockId}`).classList.toggle('hidden', isDeceased);
+        document.getElementById(`deceased_${blockId}`).classList.toggle('hidden', !isDeceased);
     }
 
     function addPeriod() {
