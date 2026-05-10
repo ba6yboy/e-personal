@@ -1062,8 +1062,14 @@ async function submitForm(e) {
             if (result.status === "success") {
                 // Зберігаємо сесію (ігноруємо помилку, якщо браузер блокує куки)
                 try { sessionStorage.setItem('hr_login', loginInput); sessionStorage.setItem('hr_pass', passInput); } catch(e) {}
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
+                
+                // Безпечне перемикання екранів (перевіряємо, чи існують блоки)
+                const loginScreenEl = document.getElementById('loginScreen');
+                const adminDashEl = document.getElementById('adminDashboard');
+                
+                if (loginScreenEl) loginScreenEl.classList.add('hidden');
+                if (adminDashEl) adminDashEl.classList.remove('hidden');
+                
                 renderAdminData(result.data);
             } else { 
                 alert(result.message); 
