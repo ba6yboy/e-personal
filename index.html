@@ -548,8 +548,11 @@
 
        
         // Варіант Б: якщо ваш масив - це об'єкти (розкоментуйте нижній рядок, а верхній видаліть)
-        // fillDatalist('countriesList', countryCodesArray.map(item => `${item.name} (${item.code})`));
-
+        function fillDatalist(id, arr) { 
+            if(document.getElementById(id)) {
+                document.getElementById(id).innerHTML = arr.map(item => `<option value="${item}">${item}</option>`).join('');
+            }
+        }
         try {
             // 2. Інші списки (міста, центри, родичі) продовжуємо тягнути з таблиці
             const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getOptions");
