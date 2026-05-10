@@ -212,30 +212,34 @@
                     <label>Яким ТЦК призваний</label>
                     <input type="text" list="centersList" name="addCenter" autocomplete="off" placeholder="Введіть або оберіть...">
                 </div>
-                <!-- Нові поля БЗВП та ВЛК -->
-            <label class="checkbox-group" style="margin-top:20px;">
-                <input type="checkbox" id="hasBZVP" onchange="toggleBlock('hasBZVP', 'bzvpDetails')">
-                <span>Наявність БЗВП</span>
-            </label>
-            <div id="bzvpDetails" class="hidden dynamic-block desktop-row">
-                <div class="form-group"><label>Рік закінчення</label><input type="text" list="yearsList" name="bzvpYear" autocomplete="off"></div>
-                <div class="form-group"><label>Індекс</label><input type="text" name="bzvpIndex"></div>
+            <!-- Нові поля БЗВП та ВЛК -->
+            <div style="width: 100%; display: block; margin-top: 25px;">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="hasBZVP" onchange="toggleBlock('hasBZVP', 'bzvpDetails')">
+                    <span>Наявність БЗВП</span>
+                </label>
+                <div id="bzvpDetails" class="hidden dynamic-block desktop-row" style="margin-top: 15px;">
+                    <div class="form-group"><label>Рік закінчення</label><input type="text" list="yearsList" name="bzvpYear" autocomplete="off"></div>
+                    <div class="form-group"><label>Індекс</label><input type="text" name="bzvpIndex"></div>
+                </div>
             </div>
 
-            <label class="checkbox-group" style="margin-top:20px;">
-                <input type="checkbox" id="hasVLK" onchange="toggleBlock('hasVLK', 'vlkDetails')">
-                <span>Проходження ВЛК</span>
-            </label>
-            <div id="vlkDetails" class="hidden dynamic-block desktop-row">
-                <div class="form-group"><label>Рівень придатності</label>
-                    <select name="vlkStatus">
-                        <option value="Придатний">Придатний</option>
-                        <option value="Придатний до служби у військових частинах забезпечення, ТЦК та СП, ВВНЗ, навчальних центрах, закладах (установах), медичних підрозділах, підрозділах логістики, зв’язку, оперативного забезпечення, охорони">Придатний до служби у частинах забезпечення...</option>
-                        <option value="Тимчасово непридатний">Тимчасово непридатний</option>
-                        <option value="Непридатний до військової служби з виключенням з військового обліку">Непридатний з виключенням з обліку</option>
-                    </select>
+            <div style="width: 100%; display: block; margin-top: 15px;">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="hasVLK" onchange="toggleBlock('hasVLK', 'vlkDetails')">
+                    <span>Проходження ВЛК</span>
+                </label>
+                <div id="vlkDetails" class="hidden dynamic-block desktop-row" style="margin-top: 15px;">
+                    <div class="form-group"><label>Рівень придатності</label>
+                        <select name="vlkStatus">
+                            <option value="Придатний">Придатний</option>
+                            <option value="Придатний до служби у військових частинах забезпечення, ТЦК та СП, ВВНЗ, навчальних центрах, закладах (установах), медичних підрозділах, підрозділах логістики, зв’язку, оперативного забезпечення, охорони">Придатний до служби у частинах забезпечення...</option>
+                            <option value="Тимчасово непридатний">Тимчасово непридатний</option>
+                            <option value="Непридатний до військової служби з виключенням з військового обліку">Непридатний з виключенням з обліку</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Рік проходження</label><input type="text" list="yearsList" name="vlkYear" autocomplete="off"></div>
                 </div>
-                <div class="form-group"><label>Рік проходження</label><input type="text" list="yearsList" name="vlkYear" autocomplete="off"></div>
             </div>
             <!-- Кінець нових полів -->
                 <div class="form-group">
