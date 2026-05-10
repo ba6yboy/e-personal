@@ -212,7 +212,14 @@
                     <label>Яким ТЦК призваний</label>
                     <input type="text" list="centersList" name="addCenter" autocomplete="off" placeholder="Введіть або оберіть...">
                 </div>
-            <!-- Нові поля БЗВП та ВЛК -->
+           
+                <div class="form-group">
+                    <label>Дата призову</label>
+                    <div class="custom-date flex-row" id="addCenterDate"></div>
+                </div>
+            </div>
+
+             <!-- Нові поля БЗВП та ВЛК -->
             <div style="width: 100%; display: block; margin-top: 25px;">
                 <label class="checkbox-group">
                     <input type="checkbox" id="hasBZVP" onchange="toggleBlock('hasBZVP', 'bzvpDetails')">
@@ -242,12 +249,7 @@
                 </div>
             </div>
             <!-- Кінець нових полів -->
-                <div class="form-group">
-                    <label>Дата призову</label>
-                    <div class="custom-date flex-row" id="addCenterDate"></div>
-                </div>
-            </div>
-
+            
             <div id="periodsContainer"></div>
             <button type="button" onclick="addPeriod()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати період служби</button>
 
