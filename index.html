@@ -325,12 +325,21 @@
 
     <!-- АДМІН -->
     <div id="admin" class="hidden">
+        
+        <!-- Обов'язково id="loginScreen" -->
         <div id="loginScreen">
             <h3>Вхід в адмін-панель</h3>
             <div class="form-group"><label>Логін</label><input type="text" id="adminLogin"></div>
             <div class="form-group"><label>Пароль</label><input type="password" id="adminPass"></div>
             <button onclick="checkAdmin()" style="width: 100%;">Увійти</button>
-            
+        </div>
+        
+        <!-- Обов'язково id="adminDashboard" -->
+        <div id="adminDashboard" class="hidden">
+            <button onclick="fetchAdminData()" style="margin-bottom: 20px;">Оновити базу</button>
+            <div id="adminDataContainer"></div>
+        </div>
+        
             <!-- Кнопка підтримки Telegram -->
             <button onclick="window.open('https://t.me/shrek_pro_bot', '_blank')" style="background: transparent; border: 2px solid #2AABEE; color: #2AABEE; margin-top: 15px; width: 100%;">💬 Підтримка в Telegram (Отримати доступ)</button>
         </div>
