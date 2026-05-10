@@ -212,6 +212,32 @@
                     <label>Яким ТЦК призваний</label>
                     <input type="text" list="centersList" name="addCenter" autocomplete="off" placeholder="Введіть або оберіть...">
                 </div>
+                <!-- Нові поля БЗВП та ВЛК -->
+            <label class="checkbox-group" style="margin-top:20px;">
+                <input type="checkbox" id="hasBZVP" onchange="toggleBlock('hasBZVP', 'bzvpDetails')">
+                <span>Наявність БЗВП</span>
+            </label>
+            <div id="bzvpDetails" class="hidden dynamic-block desktop-row">
+                <div class="form-group"><label>Рік закінчення</label><input type="text" list="yearsList" name="bzvpYear" autocomplete="off"></div>
+                <div class="form-group"><label>Індекс</label><input type="text" name="bzvpIndex"></div>
+            </div>
+
+            <label class="checkbox-group" style="margin-top:20px;">
+                <input type="checkbox" id="hasVLK" onchange="toggleBlock('hasVLK', 'vlkDetails')">
+                <span>Проходження ВЛК</span>
+            </label>
+            <div id="vlkDetails" class="hidden dynamic-block desktop-row">
+                <div class="form-group"><label>Рівень придатності</label>
+                    <select name="vlkStatus">
+                        <option value="Придатний">Придатний</option>
+                        <option value="Придатний до служби у військових частинах забезпечення, ТЦК та СП, ВВНЗ, навчальних центрах, закладах (установах), медичних підрозділах, підрозділах логістики, зв’язку, оперативного забезпечення, охорони">Придатний до служби у частинах забезпечення...</option>
+                        <option value="Тимчасово непридатний">Тимчасово непридатний</option>
+                        <option value="Непридатний до військової служби з виключенням з військового обліку">Непридатний з виключенням з обліку</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Рік проходження</label><input type="text" list="yearsList" name="vlkYear" autocomplete="off"></div>
+            </div>
+            <!-- Кінець нових полів -->
                 <div class="form-group">
                     <label>Дата призову</label>
                     <div class="custom-date flex-row" id="addCenterDate"></div>
@@ -488,7 +514,7 @@ async function submitForm(e) {
 
         try {
             // Розмір масиву зменшено на 1 через видалення табуляції
-            let arr = new Array(31).fill("");
+            let arr = new Array(33).fill("");
             
             arr[0] = document.querySelector('[name="rank"]')?.value || "";
             arr[1] = document.querySelector('[name="fullName"]')?.value || "";
@@ -577,6 +603,19 @@ async function submitForm(e) {
             
             phStr.push(`Особистий номер: ${document.querySelector('[name="mainPhoneCode"]')?.value || ""}${document.querySelector('[name="mainPhone"]')?.value || ""}`);
             arr[30] = phStr.join('\n');
+
+            // Збір даних про БЗВП та ВЛК
+               if (document.getElementById('hasBZVP')?.checked) {
+                   arr[31] = `БЗВП: ${document.querySelector('[name="bzvpYear"]')?.value || ""} р., у в/ч ${document.querySelector('[name="bzvpIndex"]')?.value || ""}`;
+               } else {
+                   arr[31] = "БЗВП не проходив";
+               }
+
+               if (document.getElementById('hasVLK')?.checked) {
+                   arr[32] = `ВЛК: ${document.querySelector('[name="vlkStatus"]')?.value || ""}, ${document.querySelector('[name="vlkYear"]')?.value || ""} р.`;
+               } else {
+                   arr[32] = "ВЛК відсутнє";
+               }
 
             const excelString = arr.map(escapeTSV).join('\t');
 
