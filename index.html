@@ -78,8 +78,14 @@
                 <div class="form-group">
                     <label>Військове звання</label>
                     <select name="rank">
-                        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                        <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                        <option value="рядовий">рядовий</option><option value="рекрут">рекрут</option>
+                        <option value="солдат">солдат</option><option value="старший солдат">старший солдат</option>
+                        <option value="єфрейтор">єфрейтор</option><option value="молодший сержант">молодший сержант</option>
+                        <option value="сержант">сержант</option><option value="старший сержант">старший сержант</option><option value="головний сержант">головний сержант</option>
+                        <option value="старшина">старшина</option><option value="прапорщик">прапорщик</option>
+                        <option value="штаб-сержант">штаб-сержант</option><option value="молодший лейтенант">молодший лейтенант</option><option value="лейтенант">лейтенант</option>
+                        <option value="старший лейтенант">старший лейтенант</option><option value="капітан">капітан</option><option value="майор">майор</option>
+                        <option value="підполковник">підполковник</option><option value="полковник">полковник</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -227,7 +233,7 @@
                 </label>
                 <div id="bzvpDetails" class="hidden dynamic-block desktop-row" style="margin-top: 15px;">
                     <div class="form-group"><label>Рік закінчення</label><input type="text" list="yearsList" name="bzvpYear" autocomplete="off"></div>
-                    <div class="form-group"><label>Індекс</label><input type="text" name="bzvpIndex"></div>
+                    <div class="form-group"><label>Військова частина</label><input type="text" name="bzvpIndex" oninput="validateZip(this)" maxlength="5" autocomplete="off"></div>
                 </div>
             </div>
 
