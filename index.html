@@ -1106,6 +1106,81 @@ async function submitForm(e) {
         }
     }
 
+async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
+        // Змінюємо вигляд кнопки під час завантаження
+        const originalText = btn.innerText;
+        btn.innerText = "⏳ Створення...";
+        btn.disabled = true;
+
+        // Розшифровуємо рядок Excel і розбиваємо його на масив по знаку табуляції
+        const rawData = decodeURIComponent(encodedData);
+        const arr = rawData.split('\t');
+
+        // Формуємо HTML-дизайн майбутньої PDF-сторінки. 
+        // Тут ви можете звертатися до будь-якої колонки масиву (наприклад, arr[30] - це телефони)
+        let htmlTemplate = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #000;">
+                <h2 style="text-align: center; text-transform: uppercase;">Особова анкета</h2>
+                <hr style="border: 1px solid #000; margin-bottom: 20px;">
+                
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 70%; vertical-align: top;">
+                            <p><strong>ПІБ:</strong> ${fullName}</p>
+                            <p><strong>Ранг/Розряд:</strong> ${arr[0] || "Не вказано"}</p>
+                            <p><strong>Дата народження:</strong> ${arr[23] || ""}</p>
+                            <p><strong>Контакти:</strong><br>${(arr[30] || "").replace(/\n/g, '<br>')}</p>
+                        </td>
+                        <td style="width: 30%; text-align: right; vertical-align: top;">
+                            <!-- Якщо є фото, можна спробувати вивести його, але для PDF надійніше дати просто посилання -->
+                            <p style="font-size: 12px; color: #555;">
+                                ${photoUrl !== "Без фото" ? `<a href="${photoUrl}">[Відкрити фотографію]</a>` : "Фото відсутнє"}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h4 style="background: #eee; padding: 5px; margin-top: 20px;">Військовий облік</h4>
+                <p>${arr[31] || ""}</p>
+                <p>${arr[32] || ""}</p>
+
+                <h4 style="background: #eee; padding: 5px; margin-top: 20px;">Повні дані (Сирий експорт для перевірки)</h4>
+                <p style="font-size: 10px; color: #333; background: #f9f9f9; padding: 10px; border: 1px dashed #aaa;">
+                    ${rawData.replace(/\n/g, '<br>')}
+                </p>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "generatePDF", fullName: fullName, htmlContent: htmlTemplate })
+            });
+            const result = await res.json();
+            
+            if (result.status === "success") {
+                btn.innerText = "✅ PDF відкрито";
+                btn.style.color = "var(--success-color)";
+                btn.style.borderColor = "var(--success-color)";
+                window.open(result.url, '_blank'); // Відкриваємо готовий PDF у новій вкладці
+            } else {
+                alert("Помилка сервера: " + result.message);
+                btn.innerText = "❌ Помилка";
+            }
+        } catch(e) {
+            alert("Помилка підключення. Перевірте інтернет.");
+            btn.innerText = "❌ Помилка";
+        }
+        
+        // Повертаємо кнопку в початковий стан через 3 секунди
+        setTimeout(() => { 
+            btn.disabled = false; 
+            btn.innerText = originalText; 
+            btn.style.color = "#e74c3c"; 
+            btn.style.borderColor = "#e74c3c"; 
+        }, 3000);
+    }
+    
     function renderAdminData(data) {
         const cont = document.getElementById('adminDataContainer');
         if (!data || data.length === 0 || (data.length === 1 && data[0][0] === "")) { 
@@ -1120,9 +1195,12 @@ async function submitForm(e) {
             const safeData = encodeURIComponent(r[2]).replace(/'/g, "%27");
             const photoUrl = r[3] ? r[3].toString().trim() : "Без фото";
             
-            // Базова кнопка копіювання
+           // Базова кнопка копіювання
             let buttonsHtml = `<button onclick="copyToExcel('${safeData}')" style="margin-right: 10px;">Копіювати</button>`;
             
+            // Кнопка генерації PDF (Червоного кольору для контрасту)
+            buttonsHtml += `<button onclick="requestPdfGeneration(this, '${r[1]}', '${safeData}', '${photoUrl}')" style="background: transparent; border: 2px solid #e74c3c; color: #e74c3c; margin-right: 10px;">📄 Створити PDF</button>`;
+
             // Якщо є посилання на фото, малюємо додаткову кнопку
             if (photoUrl !== "Без фото" && photoUrl !== "Помилка завантаження фото" && photoUrl !== "") {
                 buttonsHtml += `<button onclick="window.open('${photoUrl}', '_blank')" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">📷 Фото</button>`;
