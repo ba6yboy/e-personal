@@ -96,6 +96,7 @@
     <div id="pageLoader">Завантаження бази даних...</div>
 
     <datalist id="citiesList"></datalist>
+    <datalist id="regionsList"></datalist>
     <datalist id="centersList"></datalist>
     <datalist id="countriesList"></datalist>
     <datalist id="kinshipsList"></datalist>
@@ -156,6 +157,7 @@
             <div id="workYes" class="hidden dynamic-block desktop-row">
                 <div class="form-group"><label>Військова частина (в форматі А0000)</label><input type="text" name="prevZip" oninput="validateZip(this)" maxlength="5" autocomplete="off"></div>
                 <div class="form-group"><label>Населений пункт розташування частини</label><input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off"></div>
+               <div class="form-group"><label>Область</label><input type="text" list="regionsList" name="prevRegion" autocomplete="off"></div>
             </div>
             <div id="workNo" class="dynamic-block"><div class="form-group"><label>Не служив</label></div></div>
 
@@ -247,11 +249,13 @@
             <div class="desktop-row">
                 <div class="form-group"><label>Навчальний заклад</label><input type="text" name="university"></div>
                 <div class="form-group"><label>Населений пункт навчального закладу</label><input type="text" list="citiesList" name="universityCity" autocomplete="off"></div>
+                <div class="form-group"><label>Область</label><input type="text" list="regionsList" name="universityRegion" autocomplete="off"></div>
             </div>
             <div class="form-group"><label>Спеціальність</label><input type="text" name="specialty"></div>
 
             <h3>Демографічні дані та Сімейний стан</h3>
             <div class="form-group"><label>Місце народження</label><input type="text" list="citiesList" name="birthPlace" autocomplete="off"></div>
+            <div class="form-group"><label>Область</label><input type="text" list="regionsList" name="birthRegion" autocomplete="off"></div>
             <div class="form-group"><label>Сімейний стан</label><select name="maritalStatus"><option>Одружений/Заміжня</option><option>Неодружений/Незаміжня</option></select></div>
             
             <div id="relativesContainer"></div>
@@ -551,6 +555,7 @@
             const data = await res.json();
             
             fillDatalist('citiesList', data.cities);
+            fillDatalist('regionsList', data.regions);
             fillDatalist('centersList', data.centers);
             fillDatalist('kinshipsList', data.kinships); 
             
@@ -713,7 +718,14 @@
         return `${d}.${m}.${y}`;
     }
 
-    let blockCounter = 0;
+    function combinePlace(city, region) {
+        if (city && region) return `${city}, ${region}`;
+        if (city) return city;
+        if (region) return region;
+        return "";
+    }
+    
+    let blockCounter = 0; // Якщо у вас вже є цей рядок вище, просто залиште один
     function addRelative() {
         blockCounter++; const id = 'rel_' + blockCounter;
         const html = `
@@ -727,8 +739,9 @@
                     <span style="color: var(--error-color);">Родич помер</span>
                 </label>
                 <div id="alive_${id}" class="desktop-row">
-                    <div class="form-group"><label>Рік народження</label><input type="text" list="yearsList" class="rel-byear" autocomplete="off"></div>
-                    <div class="form-group"><label>Місце проживання</label><input type="text" list="citiesList" class="rel-liveplace" autocomplete="off"></div>
+                    <div class="form-group"><label>Рік народж.</label><input type="text" list="yearsList" class="rel-byear" autocomplete="off"></div>
+                    <div class="form-group"><label>Населений пункт</label><input type="text" list="citiesList" class="rel-liveplace" autocomplete="off"></div>
+                    <div class="form-group"><label>Область</label><input type="text" list="regionsList" class="rel-liveregion" autocomplete="off"></div>
                     <div class="form-group"><label>Телефон родича</label>
                         <div class="flex-row" style="flex-wrap: nowrap;"><input type="text" list="countriesList" class="rel-phone-code" style="width:90px;" autocomplete="off"><input type="text" class="rel-phone-num" oninput="validateNumber(this, 15)"></div>
                     </div>
@@ -736,6 +749,7 @@
                 <div id="deceased_${id}" class="hidden desktop-row">
                     <div class="form-group"><label>Рік смерті</label><input type="text" list="yearsList" class="rel-dyear" autocomplete="off"></div>
                     <div class="form-group"><label>Місце поховання</label><input type="text" list="citiesList" class="rel-dplace" autocomplete="off"></div>
+                    <div class="form-group"><label>Область</label><input type="text" list="regionsList" class="rel-dregion" autocomplete="off"></div>
                 </div>
                 <button type="button" class="btn-remove" onclick="document.getElementById('${id}').remove()">Видалити запис</button>
             </div>`;
@@ -747,7 +761,7 @@
         document.getElementById(`alive_${blockId}`).classList.toggle('hidden', isDeceased);
         document.getElementById(`deceased_${blockId}`).classList.toggle('hidden', !isDeceased);
     }
-
+    
 function addPeriod() {
         const id = 'per_' + Date.now();
         const html = `
@@ -802,7 +816,7 @@ async function submitForm(e) {
             // Попереднє місце роботи зміщено на 1 клітинку ліворуч (індекс 5 замість 6)
             // Якщо працював - беремо індекс та місто. Якщо ні - беремо центр зайнятості
             arr[5] = document.getElementById('hasWorked')?.checked ? 
-                     `${document.querySelector('[name="prevZip"]')?.value || ""}, ${document.querySelector('[name="prevCity"]')?.value || ""}` : 
+                     `${document.querySelector('[name="prevZip"]')?.value || ""}, ${combinePlace(document.querySelector('[name="prevCity"]')?.value, document.querySelector('[name="prevRegion"]')?.value)}` : 
                      (document.querySelector('[name="addCenter"]')?.value || "Не перебуває на обліку");
             
             let t = new Date();
@@ -855,25 +869,28 @@ async function submitForm(e) {
                 arr[22] = "Паперовий";
             }
 
-            arr[24] = document.querySelector('[name="birthPlace"]')?.value || "";
+            arr[24] = combinePlace(document.querySelector('[name="birthPlace"]')?.value, document.querySelector('[name="birthRegion"]')?.value);
             arr[26] = document.querySelector('[name="addCenter"]')?.value || "";
             arr[27] = getDateStr(document.getElementById('addCenterDate'));
 
             let eLvl = document.querySelector('[name="educationLevel"]')?.value || "";
             let eUni = document.querySelector('[name="university"]')?.value || "";
-            let eCity = document.querySelector('[name="universityCity"]')?.value || "";
+            let eCityStr = combinePlace(document.querySelector('[name="universityCity"]')?.value, document.querySelector('[name="universityRegion"]')?.value);
             let eYear = document.querySelector('[name="gradYear"]')?.value || "";
             let eSpec = document.querySelector('[name="specialty"]')?.value || "";
-            arr[28] = `${eLvl}\n${eUni}, ${eCity} у ${eYear} р.\n${eSpec}`;
+            arr[28] = `${eLvl}\n${eUni}, ${eCityStr} у ${eYear} р.\n${eSpec}`;
 
             let relStr = [], phStr = [];
             document.querySelectorAll('#relativesContainer .dynamic-block').forEach(b => {
                 let kin = b.querySelector('.kinship-input')?.value || "";
                 let n = b.querySelector('.rel-name')?.value || "";
                 if(b.querySelector('.is-deceased-cb')?.checked) {
-                    relStr.push(`${kin} (помер): ${n}, ${b.querySelector('.rel-dyear')?.value || ""} р. смерті\nПохований: ${b.querySelector('.rel-dplace')?.value || ""}`);
+                    let dPlace = combinePlace(b.querySelector('.rel-dplace')?.value, b.querySelector('.rel-dregion')?.value);
+                    relStr.push(`${kin} (помер): ${n}, ${b.querySelector('.rel-dyear')?.value || ""} р. смерті\nПохований: ${dPlace}`);
                 } else {
-                    relStr.push(`${kin}: ${n}, ${b.querySelector('.rel-byear')?.value || ""} р.н.\n${b.querySelector('.rel-liveplace')?.value || ""}`);
+                    let lPlace = combinePlace(b.querySelector('.rel-liveplace')?.value, b.querySelector('.rel-liveregion')?.value);
+                    relStr.push(`${kin}: ${n}, ${b.querySelector('.rel-byear')?.value || ""} р.н.\n${lPlace}`);
+//... далі залишається код збору телефонів родича ...
                     let pC = b.querySelector('.rel-phone-code')?.value || "";
                     let pN = b.querySelector('.rel-phone-num')?.value || "";
                     if(pN) phStr.push(`${kin}: ${pC}${pN}`);
