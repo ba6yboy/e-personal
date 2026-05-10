@@ -158,7 +158,7 @@
             <div id="workYes" class="hidden dynamic-block desktop-row">
                 <div class="form-group"><label>Військова частина (в форматі А0000)</label><input type="text" name="prevZip" oninput="validateZip(this)" maxlength="5" autocomplete="off"></div>
                 <div class="form-group"><label>Населений пункт розташування частини</label><input type="text" list="citiesList" name="prevCity" placeholder="Введіть або виберіть місто..." autocomplete="off"></div>
-               <div class="form-group"><label>Область</label><input type="text" list="regionsList" name="prevRegion" autocomplete="off"></div>
+               <div class="form-group"><label>Область розташування військової частини</label><input type="text" list="regionsList" name="prevRegion" autocomplete="off"></div>
             </div>
             <div id="workNo" class="dynamic-block"><div class="form-group"><label>Не служив</label></div></div>
 
@@ -1033,41 +1033,49 @@ async function submitForm(e) {
     async function checkAdmin() {
         const loginInput = document.getElementById('adminLogin').value;
         const passInput = document.getElementById('adminPass').value;
-        
-        if (!loginInput || !passInput) {
-            alert("Введіть логін та пароль!");
-            return;
-        }
-
+        if (!loginInput || !passInput) { alert("Введіть логін та пароль!"); return; }
         const btn = document.querySelector('#loginScreen button');
         btn.innerText = "Перевірка..."; btn.disabled = true;
 
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST", headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({ 
-                    action: "getAdminData", 
-                    login: loginInput, 
-                    password: passInput 
-                })
+                body: JSON.stringify({ action: "getAdminData", login: loginInput, password: passInput })
             });
             
-            const result = await res.json();
-            
-            if (result.status === "success") {
-                // Зберігаємо дані сесії тимчасово в браузері
-                sessionStorage.setItem('hr_login', loginInput);
-                sessionStorage.setItem('hr_pass', passInput);
+            // Читаємо відповідь сервера як текст, щоб побачити приховані помилки Google
+            const textResponse = await res.text();
+
+            try {
+                // Намагаємося перетворити текст у JSON
+                const result = JSON.parse(textResponse);
                 
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                renderAdminData(result.data); // Відмальовуємо отриману базу
-            } else {
-                alert(result.message); // Виведе "Невірний логін або пароль"
+                if (result.status === "success") {
+                    sessionStorage.setItem('hr_login', loginInput);
+                    sessionStorage.setItem('hr_pass', passInput);
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    
+                    // Перевіряємо, чи немає помилок під час малювання карток
+                    try {
+                        renderAdminData(result.data);
+                    } catch (renderErr) {
+                        alert("Код зламався під час малювання карток. Деталі в консолі (F12).");
+                        console.error("Помилка рендеру:", renderErr);
+                    }
+                    
+                } else { 
+                    alert(result.message); 
+                }
+            } catch (parseError) {
+                console.error("HTML відповідь від сервера (Помилка скрипта):", textResponse);
+                alert("Сервер повернув помилку Google Script замість даних. Скоріш за все, ви не зробили 'Нове розгортання' (New deployment).");
             }
-        } catch(e) {
-            alert("Помилка з'єднання з сервером.");
+        } catch(e) { 
+            alert("Справжня мережева помилка (CORS або блокувальник реклами): " + e.message); 
+            console.error(e);
         }
+        
         btn.innerText = "Увійти"; btn.disabled = false;
     }
 
