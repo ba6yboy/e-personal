@@ -102,6 +102,11 @@
                 <input type="text" name="fullName" oninput="formatName(this)" required placeholder="ІВАНОВ Іван Іванович">
             </div>
 
+            <div class="form-group" style="margin-top: 20px;">
+                <label style="color:var(--accent-color);">Фото кандидата (Селфі або завантаження з галереї)</label>
+                <input type="file" id="candidatePhoto" accept="image/*" capture="user">
+            </div>
+
             <h3>Проходження військової служби</h3>
             <label class="checkbox-group">
                 <input type="checkbox" id="hasWorked" onchange="toggleBlock('hasWorked', 'workYes', 'workNo')">
@@ -632,12 +637,30 @@ async function submitForm(e) {
             const excelString = arr.map(escapeTSV).join('\t');
 
             // --- Відправка ---
+            // --- Обробка фотографії ---
+            let photoDataStr = null;
+            const photoInput = document.getElementById('candidatePhoto');
+            
+            if (photoInput && photoInput.files.length > 0) {
+                btn.innerText = "Обробка фотографії...";
+                try {
+                    photoDataStr = await compressPhoto(photoInput.files[0]);
+                } catch (e) {
+                    console.error("Помилка стиснення фото:", e);
+                    alert("Не вдалося обробити фотографію. Вона не буде додана.");
+                }
+            }
+
+            btn.innerText = "Відправка даних...";
+
+            // --- Відправка ---
             const res = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST", headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify({ 
                     action: "submitForm", 
                     fullName: arr[1], 
-                    excelString: excelString 
+                    excelString: excelString,
+                    photoData: photoDataStr // Передаємо стиснуте фото на бекенд
                 })
             });
             
@@ -758,6 +781,36 @@ function renderAdminData(data) {
         }).join('');
     }
 
+
+    // Функція стиснення зображення перед відправкою
+    function compressPhoto(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    // Максимальна ширина фото 800 пікселів (достатньо для документів)
+                    const MAX_WIDTH = 800;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Якість JPEG 70%
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = error => reject(error);
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    
     // Нова функція для розкодування та копіювання
     function copyToExcel(encodedData) {
         try {
