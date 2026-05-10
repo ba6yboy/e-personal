@@ -1043,37 +1043,25 @@ async function submitForm(e) {
                 body: JSON.stringify({ action: "getAdminData", login: loginInput, password: passInput })
             });
             
-            // Читаємо відповідь сервера як текст, щоб побачити приховані помилки Google
-            const textResponse = await res.text();
+            let textResponse = await res.text();
+            
+            // Захист від невидимих символів сервера (BOM)
+            textResponse = textResponse.substring(textResponse.indexOf('{'), textResponse.lastIndexOf('}') + 1);
 
-            try {
-                // Намагаємося перетворити текст у JSON
-                const result = JSON.parse(textResponse);
-                
-                if (result.status === "success") {
-                    sessionStorage.setItem('hr_login', loginInput);
-                    sessionStorage.setItem('hr_pass', passInput);
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('adminDashboard').classList.remove('hidden');
-                    
-                    // Перевіряємо, чи немає помилок під час малювання карток
-                    try {
-                        renderAdminData(result.data);
-                    } catch (renderErr) {
-                        alert("Код зламався під час малювання карток. Деталі в консолі (F12).");
-                        console.error("Помилка рендеру:", renderErr);
-                    }
-                    
-                } else { 
-                    alert(result.message); 
-                }
-            } catch (parseError) {
-                console.error("HTML відповідь від сервера (Помилка скрипта):", textResponse);
-                alert("Сервер повернув помилку Google Script замість даних. Скоріш за все, ви не зробили 'Нове розгортання' (New deployment).");
+            const result = JSON.parse(textResponse);
+            
+            if (result.status === "success") {
+                // Зберігаємо сесію (ігноруємо помилку, якщо браузер блокує куки)
+                try { sessionStorage.setItem('hr_login', loginInput); sessionStorage.setItem('hr_pass', passInput); } catch(e) {}
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                renderAdminData(result.data);
+            } else { 
+                alert(result.message); 
             }
         } catch(e) { 
-            alert("Справжня мережева помилка (CORS або блокувальник реклами): " + e.message); 
-            console.error(e);
+            alert("Помилка обробки даних. Перевірте консоль."); 
+            console.error("Справжня помилка:", e);
         }
         
         btn.innerText = "Увійти"; btn.disabled = false;
@@ -1082,35 +1070,30 @@ async function submitForm(e) {
     async function fetchAdminData() {
         const loginStr = sessionStorage.getItem('hr_login');
         const passStr = sessionStorage.getItem('hr_pass');
-        
-        if (!loginStr || !passStr) {
-            alert("Сесія завершена. Будь ласка, увійдіть знову.");
-            window.location.reload();
-            return;
-        }
-
+        if (!loginStr || !passStr) { alert("Сесія завершена. Будь ласка, увійдіть знову."); window.location.reload(); return; }
         const cont = document.getElementById('adminDataContainer');
         cont.innerHTML = "Оновлення бази...";
 
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST", headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({ 
-                    action: "getAdminData", 
-                    login: loginStr, 
-                    password: passStr 
-                })
+                body: JSON.stringify({ action: "getAdminData", login: loginStr, password: passStr })
             });
             
-            const result = await res.json();
+            let textResponse = await res.text();
+            
+            // Захист від невидимих символів
+            textResponse = textResponse.substring(textResponse.indexOf('{'), textResponse.lastIndexOf('}') + 1);
+            
+            const result = JSON.parse(textResponse);
             
             if (result.status === "success") {
                 renderAdminData(result.data);
             } else {
                 cont.innerHTML = "Помилка авторизації.";
             }
-        } catch(e) {
-            cont.innerHTML = "Помилка завантаження.";
+        } catch(e) { 
+            cont.innerHTML = "Помилка завантаження бази."; 
         }
     }
 
