@@ -544,8 +544,9 @@
         
         // 1. Миттєво заповнюємо коди країн з вашого локального JS-масиву
         // Варіант А: якщо ваш масив - це просто список рядків ["Україна (+380)", "Польща (+48)"]
-        fillDatalist('countriesList', countryCodesArray);
-        
+        fillDatalist('countriesList', countryCodesArray.map(item => `${item.flag} ${item.country} (${item.code})`));        
+
+       
         // Варіант Б: якщо ваш масив - це об'єкти (розкоментуйте нижній рядок, а верхній видаліть)
         // fillDatalist('countriesList', countryCodesArray.map(item => `${item.name} (${item.code})`));
 
