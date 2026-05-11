@@ -1120,26 +1120,22 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
         const rawData = decodeURIComponent(encodedData);
         const arr = rawData.split('\t');
         
-        // Автоматична дата (сьогоднішня)
         const now = new Date();
         const currentDate = now.getDate().toString().padStart(2, '0') + '.' + 
                             (now.getMonth() + 1).toString().padStart(2, '0') + '.' + 
                             now.getFullYear();
 
-        // Допоміжна функція для очищення тексту
         const cleanText = (str) => {
             if (!str) return "";
-            // Прибираємо лапки та зайві пробіли
             return str.replace(/"/g, '').trim();
         };
 
-        // Спеціальне очищення для БЗВП та ВЛК (прибираємо назву блоку, якщо вона є в значенні)
         const cleanMilitary = (str, prefix) => {
             if (!str) return "Немає";
             return str.replace(new RegExp(prefix + ':', 'gi'), '').replace(/"/g, '').trim();
         };
 
-        // --- ОНОВЛЕНИЙ ШАБЛОН PDF ---
+        // --- ШАБЛОН PDF З ПОКРАЩЕНИМ ПЕРЕНОСОМ ТЕКСТУ ---
         let htmlTemplate = `
             <div style="font-family: Arial, sans-serif; padding: 15mm; color: #000; width: 100%; max-width: 800px; margin: auto; background: #fff;">
                 
@@ -1157,29 +1153,56 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 15px 0 10px; font-size: 12pt; border-left: 4px solid #555;">1. Загальні відомості</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4; table-layout: fixed;">
-                    <tr><td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Дата народження:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[23]) || "Не вказано"}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Ідентифікаційний код (ІПН):</strong></td><td style="word-wrap: break-word;">${cleanText(arr[20]) || "Не вказано / Відмова"}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Паспортні дані:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[22])} ${cleanText(arr[21])}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Контактні телефони:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[30]).replace(/\n/g, '<br>')}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Адреса проживання:</strong></td><td style="color: #666;"><em>__________________________________</em></td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Карта для виплат (Банк, номер):</strong></td><td style="color: #666;"><em>__________________________________</em></td></tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Дата народження:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanText(arr[23]) || "Не вказано"}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Ідентифікаційний код (ІПН):</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanText(arr[20]) || "Не вказано / Відмова"}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Паспортні дані:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanText(arr[22])} ${cleanText(arr[21])}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Контактні телефони:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanText(arr[30]).replace(/\n/g, '<br>')}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Адреса проживання:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; color: #666;"><em>__________________________________</em></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Карта для виплат:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; color: #666;"><em>__________________________________</em></td>
+                    </tr>
                 </table>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">2. Освіта</h3>
-                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word;">
+                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word; word-break: break-word;">
                     ${cleanText(arr[28]).replace(/\n/g, '<br>') || "Дані про освіту відсутні"}
                 </div>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">3. Склад сім'ї</h3>
-                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word;">
+                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word; word-break: break-word;">
                     ${(arr[29]) ? cleanText(arr[29]).replace(/\n/g, '<br>') : "Дані про родичів не вказані"}
                 </div>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">4. Військовий облік</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4; table-layout: fixed;">
-                    <tr><td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Перебуває на обліку:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[26]) || "Не перебуває на обліку"}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Наявність БЗВП:</strong></td><td style="word-wrap: break-word;">${cleanMilitary(arr[31], 'БЗВП')}</td></tr>
-                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Проходження ВЛК:</strong></td><td style="word-wrap: break-word;">${cleanMilitary(arr[32], 'ВЛК')}</td></tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Перебуває на обліку:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanText(arr[26]) || "Не перебуває на обліку"}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Наявність БЗВП:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanMilitary(arr[31], 'БЗВП')}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Проходження ВЛК:</strong></td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-wrap: break-word; word-break: break-word; white-space: normal;">${cleanMilitary(arr[32], 'ВЛК')}</td>
+                    </tr>
                 </table>
 
                 <table style="width: 100%; margin-top: 60px; font-size: 11pt; border-collapse: collapse;">
