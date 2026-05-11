@@ -1119,8 +1119,27 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
 
         const rawData = decodeURIComponent(encodedData);
         const arr = rawData.split('\t');
+        
+        // Автоматична дата (сьогоднішня)
+        const now = new Date();
+        const currentDate = now.getDate().toString().padStart(2, '0') + '.' + 
+                            (now.getMonth() + 1).toString().padStart(2, '0') + '.' + 
+                            now.getFullYear();
 
-        // --- НОВИЙ ШАБЛОН PDF (У СТИЛІ ДОКУМЕНТАРНОЇ АНКЕТИ) ---
+        // Допоміжна функція для очищення тексту
+        const cleanText = (str) => {
+            if (!str) return "";
+            // Прибираємо лапки та зайві пробіли
+            return str.replace(/"/g, '').trim();
+        };
+
+        // Спеціальне очищення для БЗВП та ВЛК (прибираємо назву блоку, якщо вона є в значенні)
+        const cleanMilitary = (str, prefix) => {
+            if (!str) return "Немає";
+            return str.replace(new RegExp(prefix + ':', 'gi'), '').replace(/"/g, '').trim();
+        };
+
+        // --- ОНОВЛЕНИЙ ШАБЛОН PDF ---
         let htmlTemplate = `
             <div style="font-family: Arial, sans-serif; padding: 15mm; color: #000; width: 100%; max-width: 800px; margin: auto; background: #fff;">
                 
@@ -1131,53 +1150,51 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
                         </td>
                         <td style="vertical-align: middle; text-align: center; padding-left: 20px;">
                             <h1 style="margin: 0; font-size: 20pt; text-transform: uppercase; letter-spacing: 1px;">Анкета Кандидата</h1>
-                            <h2 style="margin: 10px 0 0; font-size: 16pt; font-weight: normal;">${fullName}</h2>
+                            <h2 style="margin: 10px 0 0; font-size: 16pt; font-weight: normal;">${cleanText(fullName)}</h2>
                         </td>
                     </tr>
                 </table>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 15px 0 10px; font-size: 12pt; border-left: 4px solid #555;">1. Загальні відомості</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.6;">
-                    <tr><td style="width: 40%; padding: 3px 0;"><strong>Дата народження:</strong></td><td>${arr[23] || "Не вказано"}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Ідентифікаційний код (ІПН):</strong></td><td>${arr[20] || "Не вказано / Відмова"}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Паспортні дані:</strong></td><td>${arr[22] || ""} ${arr[21] || ""}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Контактні телефони:</strong></td><td>${(arr[30] || "").replace(/\n/g, '<br>')}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Адреса проживання:</strong></td><td style="color: #666;"><em>(Уточнюється)</em></td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Карта для виплат (Банк, номер):</strong></td><td style="color: #666;"><em>(Уточнюється)</em></td></tr>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4; table-layout: fixed;">
+                    <tr><td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Дата народження:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[23]) || "Не вказано"}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Ідентифікаційний код (ІПН):</strong></td><td style="word-wrap: break-word;">${cleanText(arr[20]) || "Не вказано / Відмова"}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Паспортні дані:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[22])} ${cleanText(arr[21])}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Контактні телефони:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[30]).replace(/\n/g, '<br>')}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Адреса проживання:</strong></td><td style="color: #666;"><em>__________________________________</em></td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Карта для виплат (Банк, номер):</strong></td><td style="color: #666;"><em>__________________________________</em></td></tr>
                 </table>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">2. Освіта</h3>
-                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px;">
-                    ${(arr[28] || "Дані про освіту відсутні").replace(/\n/g, '<br>')}
+                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word;">
+                    ${cleanText(arr[28]).replace(/\n/g, '<br>') || "Дані про освіту відсутні"}
                 </div>
 
-                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">3. Склад сім'ї (Батьки, Дружина/Чоловік, Діти)</h3>
-                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px;">
-                    ${(arr[29] || "") ? arr[29].replace(/\n/g, '<br><br>') : "Дані про родичів не вказані"}
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">3. Склад сім'ї</h3>
+                <div style="font-size: 11pt; line-height: 1.6; padding-left: 5px; word-wrap: break-word;">
+                    ${(arr[29]) ? cleanText(arr[29]).replace(/\n/g, '<br>') : "Дані про родичів не вказані"}
                 </div>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">4. Військовий облік</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.6;">
-                    <tr><td style="width: 40%; padding: 3px 0;"><strong>Ким призваний / Перебуває на обліку:</strong></td><td>${arr[26] || "Не перебуває на обліку"}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Наявність БЗВП:</strong></td><td>${arr[31] || "Немає"}</td></tr>
-                    <tr><td style="padding: 3px 0;"><strong>Проходження ВЛК:</strong></td><td>${arr[32] || "Немає"}</td></tr>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4; table-layout: fixed;">
+                    <tr><td style="width: 40%; padding: 5px 0; vertical-align: top;"><strong>Перебуває на обліку:</strong></td><td style="word-wrap: break-word;">${cleanText(arr[26]) || "Не перебуває на обліку"}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Наявність БЗВП:</strong></td><td style="word-wrap: break-word;">${cleanMilitary(arr[31], 'БЗВП')}</td></tr>
+                    <tr><td style="padding: 5px 0; vertical-align: top;"><strong>Проходження ВЛК:</strong></td><td style="word-wrap: break-word;">${cleanMilitary(arr[32], 'ВЛК')}</td></tr>
                 </table>
 
-                <table style="width: 100%; margin-top: 50px; font-size: 11pt; border-collapse: collapse;">
+                <table style="width: 100%; margin-top: 60px; font-size: 11pt; border-collapse: collapse;">
                     <tr>
                         <td style="width: 50%; vertical-align: bottom;">
-                            <strong>Дата заповнення:</strong> ____________________
+                            <strong>Дата заповнення:</strong> ${currentDate}
                         </td>
                         <td style="width: 50%; text-align: right; vertical-align: bottom;">
-                            <strong>Особистий підпис:</strong> ____________________<br>
-                            <span style="font-size: 9pt; color: #555;">(${fullName})</span>
+                            <strong>Особистий підпис:</strong> ____________________
                         </td>
                     </tr>
                 </table>
 
             </div>
         `;
-        // --- КІНЕЦЬ НОВОГО ШАБЛОНУ ---
 
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL, {
@@ -1185,27 +1202,20 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
                 body: JSON.stringify({ action: "generatePDF", fullName: fullName, htmlContent: htmlTemplate })
             });
             const result = await res.json();
-            
             if (result.status === "success") {
                 btn.innerText = "✅ PDF відкрито";
-                btn.style.color = "var(--success-color)";
-                btn.style.borderColor = "var(--success-color)";
                 window.open(result.url, '_blank');
             } else {
-                alert("Помилка сервера: " + result.message);
-                btn.innerText = "❌ Помилка";
+                alert("Помилка: " + result.message);
             }
         } catch(e) {
             alert("Помилка підключення.");
-            btn.innerText = "❌ Помилка";
+        } finally {
+            setTimeout(() => { 
+                btn.disabled = false; 
+                btn.innerText = originalText; 
+            }, 3000);
         }
-        
-        setTimeout(() => { 
-            btn.disabled = false; 
-            btn.innerText = originalText; 
-            btn.style.color = "#e74c3c"; 
-            btn.style.borderColor = "#e74c3c"; 
-        }, 3000);
     }
     
     function renderAdminData(data) {
