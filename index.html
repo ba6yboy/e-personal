@@ -1086,10 +1086,10 @@ async function submitForm(e) {
             const res = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST", headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify({ 
-                    action: "submitForm", 
-                    fullName: arr[1], 
-                    excelString: excelString,
-                    photoData: photoDataStr // Передаємо стиснуте фото на бекенд
+                    action: "generatePDF", 
+                    fullName: fullName, 
+                    htmlContent: htmlTemplate,
+                    photoUrl: photoUrl // Додаємо цей параметр для сервера
                 })
             });
             
