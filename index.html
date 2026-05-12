@@ -1253,17 +1253,37 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
                     </tr>
                 </table>
 
-                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">2. Освіта</h3>
+                // ... (код вище) ...
+
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 15px 0 10px; font-size: 12pt; border-left: 4px solid #555;">1. Загальні відомості</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4;">
+                    </table>
+
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">2. Демографічні дані</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4;">
+                    <tr>
+                        <td style="width: 35%; padding: 6px 0; vertical-align: top; font-weight: bold;">Стать:</td>
+                        <td style="width: 65%; padding: 6px 0; vertical-align: top; word-break: break-word;">
+                            ${arr[25] === 'Ч' ? 'Чоловіча' : (arr[25] === 'Ж' ? 'Жіноча' : cleanText(arr[25]) || "Не вказано")}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; vertical-align: top; font-weight: bold;">Місце народження:</td>
+                        <td style="padding: 6px 0; vertical-align: top; word-break: break-word;">${cleanText(arr[24]) || "Не вказано"}</td>
+                    </tr>
+                </table>
+
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">3. Освіта</h3>
                 <div style="font-size: 11pt; line-height: 1.5; padding: 5px; word-break: break-word;">
                     ${cleanText(arr[28]).replace(/\n/g, '<br>') || "Не вказано"}
                 </div>
 
-                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">3. Склад сім'ї</h3>
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">4. Склад сім'ї</h3>
                 <div style="font-size: 11pt; line-height: 1.5; padding: 5px; word-break: break-word;">
                     ${(arr[29]) ? cleanText(arr[29]).replace(/\n/g, '<br>') : "Не вказано"}
                 </div>
 
-                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">4. Військовий облік</h3>
+                <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">5. Військовий облік</h3>
                 <table style="width: 100%; border-collapse: collapse; font-size: 11pt; line-height: 1.4;">
                     <tr>
                         <td style="width: 35%; padding: 8px 0; vertical-align: top; font-weight: bold;">Перебуває на обліку:</td>
