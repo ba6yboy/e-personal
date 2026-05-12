@@ -137,6 +137,37 @@
             </div>
 
             <div class="form-group" style="margin-top: 20px;">
+                <label>Місце проживання (Фактичне)</label>
+                <input type="text" id="actualAddress" name="actualAddress" placeholder="Місто, вулиця, будинок, квартира...">
+            </div>
+            
+            <label class="checkbox-group" style="margin-bottom: 15px;">
+                <input type="checkbox" id="sameAddress" onchange="toggleRegAddress()">
+                <span>Місце реєстрації (прописка) співпадає з місцем проживання</span>
+            </label>
+            
+            <div class="form-group" id="regAddressBlock">
+                <label>Місце реєстрації</label>
+                <input type="text" id="regAddress" name="regAddress" placeholder="Місто, вулиця, будинок, квартира...">
+            </div>
+
+            <div class="desktop-row">
+                <div class="form-group">
+                    <label>Банк (для виплат)</label>
+                    <select name="bankName">
+                        <option value="">Оберіть банк...</option>
+                        <option value="ПриватБанк">ПриватБанк</option>
+                        <option value="УкрСібБанк">УкрСібБанк</option>
+                        <option value="УкрГазБанк">УкрГазБанк</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Номер картки</label>
+                    <input type="text" name="cardNumber" placeholder="0000 0000 0000 0000" oninput="formatCardNumber(this)" maxlength="19" autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 20px;">
                 <label style="color:var(--accent-color); margin-bottom: 12px;">Фото кандидата (Селфі або галерея)</label>
                 
                 <!-- Кастомна кнопка завантаження -->
@@ -685,6 +716,26 @@
         if (input.value.length === maxLen && nextId) document.getElementById(nextId)?.focus();
     }
 
+function formatCardNumber(input) {
+        // Залишаємо лише цифри
+        let val = input.value.replace(/\D/g, '');
+        // Додаємо пробіл кожні 4 цифри
+        let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+        input.value = formatted;
+    }
+
+    function toggleRegAddress() {
+        const isChecked = document.getElementById('sameAddress').checked;
+        const regBlock = document.getElementById('regAddressBlock');
+        
+        // Ховаємо поле реєстрації, якщо воно співпадає з проживанням
+        if (isChecked) {
+            regBlock.classList.add('hidden');
+        } else {
+            regBlock.classList.remove('hidden');
+        }
+    }
+    
     function validatePhone(input, maxLen) {
         // Залишаємо лише цифри
         let val = input.value.replace(/\D/g, '');
@@ -994,6 +1045,18 @@ async function submitForm(e) {
                    arr[32] = "ВЛК відсутнє";
                }
 
+            // Додаємо нові поля в кінець масиву (індекси 33-36)
+            arr[33] = document.querySelector('[name="bankName"]')?.value || "";
+            arr[34] = document.querySelector('[name="cardNumber"]')?.value || "";
+            arr[35] = document.getElementById('actualAddress')?.value || "";
+            
+            // Якщо чекбокс увімкнено, копіюємо адресу проживання в адресу реєстрації
+            if (document.getElementById('sameAddress')?.checked) {
+                arr[36] = arr[35];
+            } else {
+                arr[36] = document.getElementById('regAddress')?.value || "";
+            }
+            
             const excelString = arr.map(escapeTSV).join('\t');
 
             // --- Відправка ---
@@ -1169,6 +1232,19 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
                         <td style="padding: 6px 0; vertical-align: top; font-weight: bold;">Контактні телефони:</td>
                         <td style="padding: 6px 0; vertical-align: top; word-break: break-word;">${cleanText(arr[30]).replace(/\n/g, '<br>')}</td>
                     </tr>
+                    <tr>
+                        <td style="width: 40%; padding: 5px 0; vertical-align: top; font-weight: bold;">Адреса проживання:</td>
+                        <td style="width: 60%; padding: 5px 0; vertical-align: top; word-break: break-word;">
+                            ${arr[35] ? cleanText(arr[35]) : "<em>Не вказано</em>"}
+                            ${arr[36] && arr[36] !== arr[35] ? '<br><strong style="font-size:10pt;">Реєстрація:</strong> ' + cleanText(arr[36]) : ''}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; vertical-align: top; font-weight: bold;">Карта для виплат:</td>
+                        <td style="padding: 5px 0; vertical-align: top; word-break: break-word;">
+                            ${arr[33] ? '<strong>' + cleanText(arr[33]) + '</strong> ' : ''} ${arr[34] ? cleanText(arr[34]) : "<em>Не вказано</em>"}
+                        </td>
+                    </tr>
                 </table>
 
                 <h3 style="background: #eef2f5; padding: 6px 10px; margin: 20px 0 10px; font-size: 12pt; border-left: 4px solid #555;">2. Освіта</h3>
@@ -1292,16 +1368,20 @@ async function requestPdfGeneration(btn, fullName, encodedData, photoUrl) {
     // Нова функція для розкодування та копіювання
     function copyToExcel(encodedData) {
         try {
-            // Розкодовуємо дані назад у нормальний текст
             const textToCopy = decodeURIComponent(encodedData);
+            // Розбиваємо рядок на масив
+            const arr = textToCopy.split('\t');
             
-            // Записуємо в буфер обміну
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert("Дані скопійовано! Тепер вставте їх у таблицю Excel.");
+            // Відсікаємо все, що йде ПІСЛЯ 32-го індексу (тобто банк, карту і адреси)
+            const excelOnlyArr = arr.slice(0, 33); 
+            
+            // Збираємо назад у рядок для буфера обміну
+            navigator.clipboard.writeText(excelOnlyArr.join('\t')).then(() => { 
+                alert("Дані скопійовано! Тепер вставте їх у таблицю Excel.\n(Додаткові поля адреси та банку туди навмисно не включені)."); 
             });
-        } catch (err) {
-            alert("Не вдалося скопіювати дані.");
-            console.error(err);
+        } catch (err) { 
+            alert("Не вдалося скопіювати дані."); 
+            console.error(err); 
         }
     }
 </script>
