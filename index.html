@@ -294,7 +294,12 @@
             <h3>Демографічні дані та Сімейний стан</h3>
             <div class="form-group"><label>Місце народження</label><input type="text" list="citiesList" name="birthPlace" autocomplete="off"></div>
             <div class="form-group"><label>Область</label><input type="text" list="regionsList" name="birthRegion" autocomplete="off"></div>
-            <div class="form-group"><label>Сімейний стан</label><select name="maritalStatus"><option>Одружений/Заміжня</option><option>Неодружений/Незаміжня</option></select></div>
+            <div class="form-group"><label>Сімейний стан</label><select name="maritalStatus">
+                <option>Одружений/Заміжня</option>
+                <option>Неодружений/Незаміжня</option>
+                <option>Розлучений/Розлучена</option>
+                <option>Вдівець/Вдова</option>
+            </select></div>
             
             <div id="relativesContainer"></div>
             <button type="button" onclick="addRelative()" style="background: transparent; border: 2px solid var(--accent-color); color: var(--text-color);">+ Додати родича</button>
